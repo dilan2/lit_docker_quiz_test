@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Docker - Rozdział 3 | LearnIT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FFD60A;
+            --primary-dark: #FFC300;
+            --secondary-color: #2c3e50;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f8f9fa;
+            --yellow-light: #FFF3CD;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #333;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .quiz-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="black" opacity="0.05"><polygon points="0,0 1000,80 1000,100 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .quiz-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            color: #333;
+        }
+
+        .quiz-header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            color: #333;
+        }
+
+        .progress-container {
+            padding: 20px 30px;
+            background: var(--light-bg);
+            border-bottom: 1px solid #eee;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .question-container {
+            padding: 40px 30px;
+            min-height: 400px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .question-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(255, 214, 10, 0.2);
+        }
+
+        .question-number {
+            background: var(--primary-color);
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            border-color: var(--primary-color);
+            background: var(--yellow-light);
+            transform: translateY(-2px);
+        }
+
+        .answer-option.selected {
+            border-color: var(--primary-color);
+            background: var(--yellow-light);
+            color: #333;
+            font-weight: 600;
+        }
+
+        .answer-option.correct {
+            border-color: var(--success-color);
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .answer-option.incorrect {
+            border-color: var(--danger-color);
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .answer-option i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .explanation {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid var(--info-color);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navigation-buttons {
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--light-bg);
+        }
+
+        .btn-custom {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #333;
+            font-weight: 700;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 214, 10, 0.4);
+        }
+
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .results-container {
+            text-align: center;
+            padding: 50px 30px;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+            background: conic-gradient(var(--primary-color) 0deg, var(--primary-color) var(--score-deg, 0deg), #e9ecef var(--score-deg, 0deg));
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+        }
+
+        .score-text {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-percentage {
+            font-size: 1.2rem;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+
+        .performance-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .badge-custom {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .badge-excellent {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+
+        .badge-good {
+            background: var(--yellow-light);
+            color: #B8860B;
+            border: 2px solid var(--primary-color);
+        }
+
+        .badge-needs-improvement {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
+        }
+
+        .topic-results {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+        }
+
+        .topic-name {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .topic-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-bar {
+            width: 100px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-container,
+            .navigation-buttons {
+                padding: 20px 15px;
+            }
+
+            .performance-badges {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-circle::before {
+                width: 120px;
+                height: 120px;
+            }
+
+            .score-text {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Quiz Header -->
+        <div class="quiz-header">
+            <h1><i class="bi bi-laptop"></i> Quiz Docker</h1>
+            <p>Rozdział 3: Pierwsze spotkanie z kontenerami</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold">Postęp</span>
+                <span id="progress-text">0 / 15</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container" id="question-container">
+            <!-- Questions will be inserted here dynamically -->
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn-custom btn-secondary-custom" id="prev-btn" onclick="previousQuestion()">
+                <i class="bi bi-arrow-left"></i> Poprzedni
+            </button>
+            <div class="d-flex gap-2">
+                <button class="btn-custom btn-primary-custom" id="next-btn" onclick="nextQuestion()">
+                    Następny <i class="bi bi-arrow-right"></i>
+                </button>
+                <button class="btn-custom btn-primary-custom hidden" id="finish-btn" onclick="finishQuiz()">
+                    Zakończ quiz <i class="bi bi-check-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div class="results-container" id="results-container">
+            <h2 class="mb-4">Gratulacje! Quiz zakończony!</h2>
+            
+            <div class="score-circle" id="score-circle">
+                <div class="text-center">
+                    <div class="score-text" id="score-text">0</div>
+                    <div class="score-percentage">/ 15</div>
+                </div>
+            </div>
+
+            <div class="performance-badges" id="performance-badges">
+                <!-- Badges will be added dynamically -->
+            </div>
+
+            <div class="topic-results">
+                <h4 class="mb-3">Wyniki według tematów</h4>
+                <div id="topic-scores">
+                    <!-- Topic scores will be added dynamically -->
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn-custom btn-primary-custom" onclick="restartQuiz()">
+                    <i class="bi bi-arrow-clockwise"></i> Rozpocznij ponownie
+                </button>
+                <button class="btn-custom btn-secondary-custom ms-3" onclick="reviewAnswers()">
+                    <i class="bi bi-eye"></i> Przejrzyj odpowiedzi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Quiz Data
+        const quizData = [
+            {
+                id: 1,
+                question: "Czym jest kontener Docker w najprostszym ujęciu?",
+                type: "multiple",
+                options: [
+                    "Maszyną wirtualną z własnym systemem operacyjnym",
+                    "Lekkim, izolowanym środowiskiem zawierającym aplikację i jej zależności",
+                    "Katalogiem z kodem źródłowym aplikacji",
+                    "Narzędziem do kompresji plików"
+                ],
+                correct: 1,
+                explanation: "Kontener Docker to lekkie, izolowane środowisko, które zawiera aplikację wraz ze wszystkimi jej zależnościami, zapewniając spójne działanie na różnych platformach.",
+                topic: "Podstawy Docker"
+            },
+            {
+                id: 2,
+                question: "Które polecenie służy do pobrania obrazu z Docker Hub?",
+                type: "multiple",
+                options: [
+                    "docker get nginx",
+                    "docker download nginx", 
+                    "docker pull nginx",
+                    "docker fetch nginx"
+                ],
+                correct: 2,
+                explanation: "Polecenie 'docker pull' służy do pobierania obrazów z rejestru Docker (domyślnie Docker Hub).",
+                topic: "Komendy Docker"
+            },
+            {
+                id: 3,
+                question: "Co oznacza flaga '-d' w poleceniu 'docker run -d nginx'?",
+                type: "multiple",
+                options: [
+                    "Uruchomienie w trybie debugowania",
+                    "Usunięcie kontenera po zakończeniu",
+                    "Uruchomienie w trybie tła (detached)",
+                    "Uruchomienie z podwyższonymi uprawnieniami"
+                ],
+                correct: 2,
+                explanation: "Flaga '-d' oznacza 'detached mode' - kontener działa w tle, nie blokując terminala.",
+                topic: "Komendy Docker"
+            },
+            {
+                id: 4,
+                question: "Dockerfile rozpoczyna się od instrukcji FROM. Prawda czy fałsz?",
+                type: "boolean",
+                options: ["Prawda", "Fałsz"],
+                correct: 0,
+                explanation: "Prawda. Każdy Dockerfile musi rozpoczynać się od instrukcji FROM, która określa bazowy obraz.",
+                topic: "Dockerfile"
+            },
+            {
+                id: 5,
+                question: "Która instrukcja w Dockerfile służy do kopiowania plików z hosta do obrazu?",
+                type: "multiple",
+                options: [
+                    "MOVE",
+                    "COPY",
+                    "TRANSFER",
+                    "ADD"
+                ],
+                correct: 1,
+                explanation: "Instrukcja COPY służy do kopiowania plików z hosta do obrazu. ADD ma podobną funkcję, ale z dodatkowymi możliwościami (np. rozpakowywanie archiwów).",
+                topic: "Dockerfile"
+            },
+            {
+                id: 6,
+                question: "Co robi polecenie 'docker ps'?",
+                type: "multiple",
+                options: [
+                    "Wyświetla wszystkie dostępne obrazy",
+                    "Wyświetla uruchomione kontenery",
+                    "Wyświetla listę sieci Docker",
+                    "Wyświetla wykorzystanie zasobów"
+                ],
+                correct: 1,
+                explanation: "Polecenie 'docker ps' wyświetla listę obecnie uruchomionych kontenerów. Aby zobaczyć wszystkie kontenery (włącznie z zatrzymanymi), użyj 'docker ps -a'.",
+                topic: "Komendy Docker"
+            },
+            {
+                id: 7,
+                question: "Wolumeny w Docker służą do przechowywania danych poza kontenerem. Prawda czy fałsz?",
+                type: "boolean",
+                options: ["Prawda", "Fałsz"],
+                correct: 0,
+                explanation: "Prawda. Wolumeny pozwalają na trwałe przechowywanie danych poza kontenerem, co oznacza, że dane przetrwają usunięcie kontenera.",
+                topic: "Wolumeny"
+            },
+            {
+                id: 8,
+                question: "Które polecenie tworzy nazwany wolumen?",
+                type: "multiple",
+                options: [
+                    "docker volume create mydata",
+                    "docker create volume mydata",
+                    "docker make volume mydata",
+                    "docker new volume mydata"
+                ],
+                correct: 0,
+                explanation: "Polecenie 'docker volume create mydata' tworzy nazwany wolumen o nazwie 'mydata'.",
+                topic: "Wolumeny"
+            },
+            {
+                id: 9,
+                question: "Co oznacza przekierowanie portów '-p 80:80' w docker run?",
+                type: "multiple",
+                options: [
+                    "Port 80 hosta przekierowuje na port 80 kontenera",
+                    "Port 80 kontenera przekierowuje na port 80 hosta",
+                    "Otwiera port 80 tylko wewnątrz kontenera",
+                    "Blokuje port 80 na hoście"
+                ],
+                correct: 0,
+                explanation: "Składnia '-p 80:80' oznacza przekierowanie portu 80 z hosta na port 80 kontenera (host:kontener).",
+                topic: "Sieć Docker"
+            },
+            {
+                id: 10,
+                question: "Które polecenie pozwala połączyć się z działającym kontenerem?",
+                type: "multiple",
+                options: [
+                    "docker connect container_id",
+                    "docker exec -it container_id bash",
+                    "docker attach container_id",
+                    "docker ssh container_id"
+                ],
+                correct: 1,
+                explanation: "Polecenie 'docker exec -it container_id bash' otwiera interaktywną sesję bash wewnątrz działającego kontenera.",
+                topic: "Debugowanie"
+            },
+            {
+                id: 11,
+                question: "Multi-stage builds w Docker służą do optymalizacji rozmiaru obrazów. Prawda czy fałsz?",
+                type: "boolean",
+                options: ["Prawda", "Fałsz"],
+                correct: 0,
+                explanation: "Prawda. Multi-stage builds pozwalają na budowanie aplikacji w jednym etapie, a następnie kopiowanie tylko niezbędnych plików do finalnego obrazu, co znacznie zmniejsza jego rozmiar.",
+                topic: "Optymalizacja"
+            },
+            {
+                id: 12,
+                question: "Które z poniższych to najlepsza praktyka bezpieczeństwa w Docker?",
+                type: "multiple",
+                options: [
+                    "Uruchamianie kontenerów jako root",
+                    "Używanie oficjalnych obrazów z Docker Hub",
+                    "Ignorowanie aktualizacji obrazów",
+                    "Udostępnianie wszystkich portów"
+                ],
+                correct: 1,
+                explanation: "Używanie oficjalnych obrazów z Docker Hub to podstawowa praktyka bezpieczeństwa, ponieważ są one regularnie aktualizowane i sprawdzane pod kątem bezpieczeństwa.",
+                topic: "Bezpieczeństwo"
+            },
+            {
+                id: 13,
+                question: "Co robi polecenie 'docker logs container_id'?",
+                type: "multiple",
+                options: [
+                    "Wyświetla konfigurację kontenera",
+                    "Wyświetla logi aplikacji wewnątrz kontenera", 
+                    "Wyświetla wykorzystanie zasobów",
+                    "Wyświetla listę procesów w kontenerze"
+                ],
+                correct: 1,
+                explanation: "Polecenie 'docker logs' wyświetla logi (stdout/stderr) aplikacji działającej wewnątrz kontenera.",
+                topic: "Debugowanie"
+            },
+            {
+                id: 14,
+                question: "Sieci Docker pozwalają kontenerom komunikować się między sobą. Prawda czy fałsz?",
+                type: "boolean",
+                options: ["Prawda", "Fałsz"],
+                correct: 0,
+                explanation: "Prawda. Sieci Docker umożliwiają bezpieczną komunikację między kontenerami i izolują je od innych sieci.",
+                topic: "Sieć Docker"
+            },
+            {
+                id: 15,
+                question: "Która instrukcja w Dockerfile definiuje polecenie uruchamiane przy starcie kontenera?",
+                type: "multiple",
+                options: [
+                    "RUN",
+                    "CMD",
+                    "START",
+                    "EXEC"
+                ],
+                correct: 1,
+                explanation: "Instrukcja CMD definiuje domyślne polecenie uruchamiane przy starcie kontenera. RUN wykonuje polecenia podczas budowania obrazu.",
+                topic: "Dockerfile"
+            }
+        ];
+
+        // Quiz State
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let quizFinished = false;
+        let reviewMode = false;
+
+        // Topics for scoring
+        const topics = {
+            "Podstawy Docker": [],
+            "Komendy Docker": [],
+            "Dockerfile": [],
+            "Wolumeny": [],
+            "Sieć Docker": [],
+            "Debugowanie": [],
+            "Optymalizacja": [],
+            "Bezpieczeństwo": []
+        };
+
+        // Initialize quiz
+        function initQuiz() {
+            // Group questions by topic
+            quizData.forEach(q => {
+                if (topics[q.topic]) {
+                    topics[q.topic].push(q.id);
+                }
+            });
+
+            userAnswers = new Array(quizData.length).fill(null);
+            showQuestion(0);
+            updateProgress();
+            updateNavigation();
+        }
+
+        // Show question
+        function showQuestion(index) {
+            try {
+                const question = quizData[index];
+                const container = document.getElementById('question-container');
+                
+                if (!container || !question) {
+                    console.error('Nie można znaleźć kontenera pytań lub pytania');
+                    return;
+                }
+                
+                let optionsHtml = '';
+                question.options.forEach((option, i) => {
+                    const isSelected = userAnswers[index] === i;
+                    const selectedClass = isSelected ? 'selected' : '';
+                    const icon = question.type === 'boolean' ? 
+                        (i === 0 ? 'bi-check-circle' : 'bi-x-circle') : 
+                        'bi-circle';
+                    
+                    optionsHtml += `
+                        <div class="answer-option ${selectedClass}" onclick="selectAnswer(${i})">
+                            <i class="bi ${icon}"></i>
+                            <span>${option}</span>
+                        </div>
+                    `;
+                });
+
+                const codeExample = question.code ? `<div class="code-block">${question.code}</div>` : '';
+
+                container.innerHTML = `
+                    <div class="question-card active">
+                        <div class="question-number">Pytanie ${index + 1} z ${quizData.length}</div>
+                        <div class="question-text">${question.question}</div>
+                        ${codeExample}
+                        <div class="options">
+                            ${optionsHtml}
+                        </div>
+                        <div class="explanation" id="explanation">
+                            <h6><i class="bi bi-lightbulb"></i> Wyjaśnienie:</h6>
+                            <p>${question.explanation}</p>
+                        </div>
+                    </div>
+                `;
+
+                if (reviewMode && userAnswers[index] !== null) {
+                    showAnswerResults(index);
+                }
+            } catch (error) {
+                console.error('Błąd podczas wyświetlania pytania:', error);
+            }
+        }
+
+        // Select answer
+        function selectAnswer(answerIndex) {
+            if (quizFinished && !reviewMode) return;
+
+            userAnswers[currentQuestion] = answerIndex;
+            
+            // Update UI
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach((option, i) => {
+                option.classList.remove('selected');
+                if (i === answerIndex) {
+                    option.classList.add('selected');
+                }
+            });
+
+            updateNavigation();
+        }
+
+        // Show answer results (for review mode)
+        function showAnswerResults(questionIndex) {
+            const question = quizData[questionIndex];
+            const userAnswer = userAnswers[questionIndex];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((option, i) => {
+                option.classList.remove('selected');
+                if (i === question.correct) {
+                    option.classList.add('correct');
+                }
+                if (i === userAnswer && userAnswer !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+                if (i === userAnswer) {
+                    option.classList.add('selected');
+                }
+            });
+
+            document.getElementById('explanation').classList.add('show');
+        }
+
+        // Navigation functions
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `${currentQuestion + 1} / ${quizData.length}`;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finishBtn = document.getElementById('finish-btn');
+
+            prevBtn.style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.classList.add('hidden');
+                finishBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                finishBtn.classList.add('hidden');
+            }
+
+            // Enable finish button only if current question is answered
+            if (userAnswers[currentQuestion] !== null) {
+                finishBtn.disabled = false;
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Finish quiz
+        function finishQuiz() {
+            quizFinished = true;
+            calculateResults();
+            showResults();
+        }
+
+        // Calculate results
+        function calculateResults() {
+            let correctAnswers = 0;
+            const topicScores = {};
+
+            // Initialize topic scores
+            Object.keys(topics).forEach(topic => {
+                topicScores[topic] = { correct: 0, total: 0 };
+            });
+
+            // Calculate scores
+            quizData.forEach((question, index) => {
+                const isCorrect = userAnswers[index] === question.correct;
+                if (isCorrect) correctAnswers++;
+
+                // Update topic scores
+                if (topicScores[question.topic]) {
+                    topicScores[question.topic].total++;
+                    if (isCorrect) {
+                        topicScores[question.topic].correct++;
+                    }
+                }
+            });
+
+            return {
+                totalScore: correctAnswers,
+                percentage: Math.round((correctAnswers / quizData.length) * 100),
+                topicScores: topicScores
+            };
+        }
+
+        // Show results
+        function showResults() {
+            const results = calculateResults();
+            
+            document.getElementById('question-container').style.display = 'none';
+            document.querySelector('.navigation-buttons').style.display = 'none';
+            document.getElementById('results-container').classList.add('show');
+
+            // Update score circle
+            const scoreCircle = document.getElementById('score-circle');
+            const scoreDeg = (results.percentage / 100) * 360;
+            scoreCircle.style.setProperty('--score-deg', scoreDeg + 'deg');
+            
+            document.getElementById('score-text').textContent = results.totalScore;
+
+            // Add performance badges
+            const badgesContainer = document.getElementById('performance-badges');
+            badgesContainer.innerHTML = '';
+            
+            if (results.percentage >= 90) {
+                badgesContainer.innerHTML += '<span class="badge-custom badge-excellent"><i class="bi bi-trophy"></i> Doskonały wynik!</span>';
+            } else if (results.percentage >= 70) {
+                badgesContainer.innerHTML += '<span class="badge-custom badge-good"><i class="bi bi-star"></i> Dobry wynik!</span>';
+            } else {
+                badgesContainer.innerHTML += '<span class="badge-custom badge-needs-improvement"><i class="bi bi-arrow-up"></i> Potrzebujesz więcej praktyki</span>';
+            }
+
+            // Show topic results
+            const topicContainer = document.getElementById('topic-scores');
+            topicContainer.innerHTML = '';
+            
+            Object.entries(results.topicScores).forEach(([topic, score]) => {
+                if (score.total > 0) {
+                    const percentage = Math.round((score.correct / score.total) * 100);
+                    const color = percentage >= 80 ? 'var(--success-color)' : 
+                                 percentage >= 60 ? 'var(--warning-color)' : 'var(--danger-color)';
+                    
+                    topicContainer.innerHTML += `
+                        <div class="topic-item">
+                            <span class="topic-name">${topic}</span>
+                            <div class="topic-score">
+                                <span>${score.correct}/${score.total}</span>
+                                <div class="score-bar">
+                                    <div class="score-fill" style="width: ${percentage}%; background: ${color};"></div>
+                                </div>
+                                <span>${percentage}%</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            quizFinished = false;
+            reviewMode = false;
+            
+            document.getElementById('results-container').classList.remove('show');
+            document.getElementById('question-container').style.display = 'block';
+            document.querySelector('.navigation-buttons').style.display = 'flex';
+            
+            initQuiz();
+        }
+
+        // Review answers
+        function reviewAnswers() {
+            reviewMode = true;
+            currentQuestion = 0;
+            
+            document.getElementById('results-container').classList.remove('show');
+            document.getElementById('question-container').style.display = 'block';
+            document.querySelector('.navigation-buttons').style.display = 'flex';
+            
+            showQuestion(0);
+            updateProgress();
+            updateNavigation();
+        }
+
+        // Initialize the quiz when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuiz();
+        });
+    </script>
+</body>
+</html>
