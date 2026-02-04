@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz | LearnIT</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Prism.js Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+
+    <style>
+        :root {
+            --color-primary: #FFD700;
+            --color-primary-dark: #E6C200;
+            --color-dark: #1a1a1a;
+            --color-dark-secondary: #2d2d2d;
+            --color-gray: #6b7280;
+            --color-gray-light: #f3f4f6;
+            --color-white: #ffffff;
+            --color-success: #22c55e;
+            --color-error: #ef4444;
+            --color-warning: #f59e0b;
+            --color-info: #3b82f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --border-radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font-family);
+            line-height: 1.7;
+            color: var(--color-dark);
+            background: var(--color-white);
+            min-height: 100vh;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+        /* Page Header */
+        .page-header {
+            background: var(--color-dark);
+            color: var(--color-white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0 30px 0;
+            border-radius: var(--border-radius);
+        }
+
+        .header-info { display: flex; align-items: center; gap: 15px; }
+
+        .header-badge {
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title { font-size: 0.9rem; color: #a1a1aa; }
+
+        /* Progress Section */
+        .progress-section { margin-bottom: 30px; }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-counter { font-size: 0.9rem; color: var(--color-gray); }
+        .progress-counter strong { color: var(--color-dark); font-weight: 700; }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--color-gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-dark);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .question-code {
+            background: var(--color-dark);
+            color: #e5e5e5;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin-bottom: 25px;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Options */
+        .options-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px 20px;
+            background: var(--color-gray-light);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover:not(.disabled) { background: #e8e8e8; border-color: var(--color-gray); }
+        .option-item.selected { background: #fffbeb; border-color: var(--color-primary); }
+        .option-item.correct { background: #f0fdf4; border-color: var(--color-success); }
+        .option-item.incorrect { background: #fef2f2; border-color: var(--color-error); }
+        .option-item.disabled { cursor: default; }
+
+        .option-key {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-white);
+            border: 2px solid var(--color-gray);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--color-dark);
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .option-item.selected .option-key {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-dark);
+        }
+
+        .option-item.correct .option-key {
+            background: var(--color-success);
+            border-color: var(--color-success);
+            color: var(--color-white);
+        }
+
+        .option-item.incorrect .option-key {
+            background: var(--color-error);
+            border-color: var(--color-error);
+            color: var(--color-white);
+        }
+
+        .option-content { flex: 1; }
+        .option-text { font-size: 1rem; line-height: 1.5; padding-top: 4px; color: var(--color-dark); }
+
+        .option-explanation {
+            margin-top: 10px;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+            display: none;
+        }
+
+        .option-explanation.show { display: block; }
+
+        .option-item.correct .option-explanation {
+            background: rgba(34, 197, 94, 0.1);
+            color: #166534;
+        }
+
+        .option-item.incorrect .option-explanation {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--color-primary); color: var(--color-dark); }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-secondary { background: var(--color-dark); color: var(--color-white); }
+        .btn-secondary:hover { background: var(--color-dark-secondary); transform: translateY(-2px); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--color-dark);
+            border: 2px solid var(--color-gray);
+        }
+        .btn-outline:hover {
+            border-color: var(--color-dark);
+            background: var(--color-gray-light);
+        }
+
+        .btn-full { width: 100%; }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-left { flex: 1; }
+        .nav-right { flex: 1; display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Results Screen */
+        .results-screen { display: none; }
+        .results-screen.active { display: block; }
+        .quiz-screen.hidden { display: none; }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-secondary) 100%);
+            color: var(--color-white);
+            padding: 50px 40px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: var(--color-primary);
+            opacity: 0.1;
+            border-radius: 50%;
+        }
+
+        .results-badge {
+            display: inline-block;
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .results-score { font-size: 4rem; font-weight: 800; margin-bottom: 10px; line-height: 1; }
+        .results-score.score-high { color: var(--color-success); }
+        .results-score.score-medium { color: var(--color-primary); }
+        .results-score.score-low { color: var(--color-error); }
+
+        .results-label { font-size: 1.1rem; color: #a1a1aa; margin-bottom: 30px; }
+
+        .results-stats { display: flex; justify-content: center; gap: 50px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--color-white); }
+        .stat-label { font-size: 0.75rem; color: #71717a; text-transform: uppercase; letter-spacing: 1px; }
+
+        .pass-status {
+            margin-top: 25px;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pass-status.passed { background: rgba(34, 197, 94, 0.2); color: var(--color-success); }
+        .pass-status.failed { background: rgba(239, 68, 68, 0.2); color: var(--color-error); }
+
+        /* Topic Results */
+        .topic-results {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .topic-results-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-gray-light);
+        }
+
+        .topic-item:last-child { border-bottom: none; }
+
+        .topic-name { font-weight: 600; color: var(--color-dark); }
+
+        .topic-score-container { display: flex; align-items: center; gap: 15px; }
+
+        .topic-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--color-gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .topic-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .topic-score-text { font-size: 0.9rem; color: var(--color-gray); min-width: 70px; text-align: right; }
+
+        /* Review Section */
+        .review-section { margin-bottom: 30px; }
+
+        .review-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .review-list { display: flex; flex-direction: column; gap: 20px; }
+
+        .review-item {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            transition: all 0.2s ease;
+        }
+
+        .review-item.correct { border-left: 4px solid var(--color-success); }
+        .review-item.incorrect { border-left: 4px solid var(--color-error); }
+
+        .review-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+
+        .review-status {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .review-status.correct { background: #f0fdf4; color: var(--color-success); }
+        .review-status.incorrect { background: #fef2f2; color: var(--color-error); }
+
+        .review-question { font-weight: 600; font-size: 1rem; line-height: 1.5; color: var(--color-dark); }
+
+        .review-answers { margin-bottom: 15px; }
+
+        .review-answer {
+            font-size: 0.9rem;
+            padding: 8px 0;
+            color: var(--color-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .review-answer-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+        .review-answer.user-correct { color: var(--color-success); font-weight: 500; }
+        .review-answer.user-incorrect { color: var(--color-error); font-weight: 500; }
+        .review-answer.correct-answer { color: var(--color-success); font-weight: 500; }
+
+        .review-explanation {
+            padding: 15px 20px;
+            background: #fefce8;
+            border-left: 4px solid var(--color-primary);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .explanation-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a16207;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .explanation-text { font-size: 0.9rem; color: var(--color-dark); line-height: 1.6; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .document-footer {
+            background: var(--color-dark);
+            color: var(--color-white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px 0 40px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-logo { display: flex; align-items: center; }
+        .footer-contacts { display: flex; gap: 25px; flex-wrap: wrap; }
+
+        .footer-contact { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .footer-contact a { color: var(--color-white); text-decoration: none; transition: color 0.2s ease; }
+        .footer-contact a:hover { color: var(--color-primary); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 0 15px; }
+            .page-header { flex-direction: column; gap: 10px; text-align: center; padding: 20px; }
+            .quiz-card { padding: 25px 20px; }
+            .question-text { font-size: 1.1rem; }
+            .option-item { padding: 15px; }
+            .results-header { padding: 35px 25px; }
+            .results-score { font-size: 3rem; }
+            .results-stats { gap: 30px; }
+            .navigation-buttons { flex-direction: column; }
+            .nav-left, .nav-right { justify-content: center; }
+            .document-footer { flex-direction: column; text-align: center; }
+            .footer-contacts { justify-content: center; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons .btn { width: 100%; }
+        }
+
+        .hidden { display: none !important; }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-card {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 50px 40px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .start-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2.5rem;
+        }
+
+        .start-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 10px;
+        }
+
+        .start-description {
+            font-size: 1rem;
+            color: var(--color-gray);
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+        }
+
+        .meta-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-gray-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .email-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .email-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-dark);
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            outline: none;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+
+        .email-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .email-input.error {
+            border-color: var(--color-error);
+        }
+
+        .email-error {
+            font-size: 0.85rem;
+            color: var(--color-error);
+            text-align: left;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .email-error.show {
+            display: block;
+        }
+
+        .start-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Continue Section */
+        .continue-section {
+            margin-bottom: 30px;
+        }
+
+        .continue-card {
+            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .continue-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 15px;
+        }
+
+        .continue-info {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+        }
+
+        .continue-info strong {
+            color: var(--color-dark);
+        }
+
+        .continue-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .continue-buttons .btn {
+            padding: 12px 25px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .continue-buttons {
+                flex-direction: column;
+            }
+            .continue-buttons .btn {
+                width: 100%;
+            }
+            .continue-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <svg width="100" height="17" viewBox="0 0 159 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_header)"><path d="M149.406 23.7717C149.096 23.7717 148.681 23.6701 148.474 23.3652C147.956 22.8571 147.956 22.0441 148.474 21.5359L155.93 14.2188L148.474 6.90179C147.956 6.39366 147.956 5.58063 148.474 5.0725C148.992 4.56437 149.82 4.56437 150.338 5.0725L158.726 13.3042C158.933 13.5075 159.14 13.914 159.14 14.2188C159.14 14.5237 159.037 14.9302 158.726 15.1335L150.338 23.3652C150.131 23.5684 149.717 23.7717 149.406 23.7717Z" fill="#FFDA17"/><path d="M12.1147 23.7717C11.804 23.7717 11.3898 23.6701 11.1827 23.3652L2.79506 15.1335C2.58796 14.9302 2.38086 14.5237 2.38086 14.2188C2.38086 13.914 2.4844 13.5075 2.79506 13.3042L11.1827 5.0725C11.7005 4.56437 12.5289 4.56437 13.0467 5.0725C13.5644 5.58063 13.5644 6.39366 13.0467 6.90179L5.59095 14.2188L13.0467 21.5359C13.5644 22.0441 13.5644 22.8571 13.0467 23.3652C12.8396 23.5684 12.4254 23.7717 12.1147 23.7717Z" fill="#FFDA17"/><path d="M131.284 23.7713C130.973 23.7713 130.766 23.6697 130.559 23.568C129.938 23.1615 129.834 22.3485 130.249 21.7388L142.053 5.27536C142.468 4.6656 143.296 4.56395 143.917 4.97046C144.539 5.37696 144.642 6.18999 144.228 6.79975L132.423 23.2631C132.112 23.568 131.698 23.7713 131.284 23.7713Z" fill="#FFDA17"/><path d="M128.388 2.5C128.762 2.5 129.064 2.6245 129.295 2.87351C129.544 3.10473 129.669 3.4071 129.669 3.78061C129.669 4.15412 129.544 4.46538 129.295 4.71438C129.064 4.9456 128.762 5.06121 128.388 5.06121H122.652V21.9492C122.652 22.3405 122.519 22.6696 122.252 22.9364C121.985 23.2031 121.656 23.3365 121.265 23.3365C120.873 23.3365 120.544 23.2031 120.278 22.9364C120.011 22.6696 119.877 22.3405 119.877 21.9492V5.06121H114.115C113.741 5.06121 113.43 4.9456 113.181 4.71438C112.95 4.46538 112.834 4.15412 112.834 3.78061C112.834 3.4071 112.95 3.10473 113.181 2.87351C113.43 2.6245 113.741 2.5 114.115 2.5H128.388Z" fill="#FFFFFF"/><path d="M107 3.88732C107 3.47824 107.133 3.1492 107.4 2.90019C107.667 2.6334 107.996 2.5 108.387 2.5C108.796 2.5 109.125 2.6334 109.374 2.90019C109.641 3.1492 109.775 3.47824 109.775 3.88732V21.9492C109.775 22.3405 109.641 22.6696 109.374 22.9364C109.125 23.2031 108.796 23.3365 108.387 23.3365C107.996 23.3365 107.667 23.2031 107.4 22.9364C107.133 22.6696 107 22.3405 107 21.9492V3.88732Z" fill="#FFFFFF"/><path d="M93.1347 8.6095C94.362 8.6095 95.4647 8.87629 96.4429 9.40988C97.4212 9.94346 98.186 10.7261 98.7374 11.7577C99.2887 12.7715 99.5644 13.9987 99.5644 15.4394V22.0025C99.5644 22.3938 99.431 22.7229 99.1642 22.9896C98.9152 23.2387 98.5951 23.3632 98.2038 23.3632C97.8125 23.3632 97.4834 23.2387 97.2166 22.9896C96.9676 22.7229 96.8431 22.3938 96.8431 22.0025V15.4394C96.8431 13.9987 96.4518 12.9138 95.6692 12.1845C94.9044 11.4375 93.8817 11.064 92.6011 11.064C91.8541 11.064 91.1693 11.2152 90.5468 11.5175C89.9421 11.8199 89.4618 12.229 89.1061 12.7448C88.7682 13.2606 88.5992 13.8386 88.5992 14.4789V22.0025C88.5992 22.3938 88.4747 22.7229 88.2257 22.9896C87.9767 23.2387 87.6477 23.3632 87.2386 23.3632C86.8473 23.3632 86.5182 23.2387 86.2514 22.9896C86.0024 22.7229 85.8779 22.3938 85.8779 22.0025V10.1035C85.8779 9.69446 86.0024 9.36541 86.2514 9.1164C86.5182 8.8674 86.8473 8.74289 87.2386 8.74289C87.6477 8.74289 87.9767 8.8674 88.2257 9.1164C88.4747 9.36541 88.5992 9.69446 88.5992 10.1035V10.397C89.1684 9.82785 89.8443 9.39209 90.6268 9.08972C91.4094 8.76957 92.2454 8.6095 93.1347 8.6095Z" fill="#FFFFFF"/><path d="M80.0534 8.58289C80.996 8.58289 81.7342 8.72518 82.2678 9.00976C82.8013 9.29433 83.0681 9.65006 83.0681 10.0769C83.0681 10.2014 83.0592 10.2904 83.0415 10.3437C82.8814 10.9129 82.5257 11.1975 81.9743 11.1975C81.8854 11.1975 81.752 11.1797 81.5741 11.1441C80.8627 11.0196 80.2846 10.9573 79.8399 10.9573C78.5593 10.9573 77.5277 11.2508 76.7451 11.8378C75.9625 12.4247 75.5713 13.2162 75.5713 14.2122V22.0026C75.5713 22.4295 75.4556 22.7585 75.2244 22.9897C75.011 23.2209 74.6819 23.3365 74.2373 23.3365C73.8104 23.3365 73.4814 23.2298 73.2502 23.0164C73.0189 22.7852 72.9033 22.4472 72.9033 22.0026V10.0769C72.9033 9.65006 73.0189 9.32101 73.2502 9.08979C73.4814 8.85857 73.8104 8.74296 74.2373 8.74296C75.1266 8.74296 75.5713 9.18762 75.5713 10.0769V10.5838C76.1048 9.96132 76.7629 9.4722 77.5455 9.11647C78.3281 8.76075 79.1641 8.58289 80.0534 8.58289Z" fill="#FFFFFF"/><path d="M61.5158 8.63623C62.8854 8.63623 64.1215 8.96527 65.2243 9.62336C66.3448 10.2637 67.2252 11.153 67.8655 12.2913C68.5236 13.4118 68.8526 14.6658 68.8526 16.0531V22.0026C68.8526 22.3939 68.7193 22.7229 68.4525 22.9897C68.2035 23.2387 67.8833 23.3632 67.492 23.3632C67.1007 23.3632 66.7717 23.2387 66.5049 22.9897C66.2559 22.7229 66.1314 22.3939 66.1314 22.0026V21.0154C65.5088 21.7802 64.7529 22.3761 63.8636 22.8029C62.9743 23.2298 62.0139 23.4432 60.9823 23.4432C59.7016 23.4432 58.5366 23.1231 57.4873 22.4828C56.4557 21.8425 55.6375 20.9621 55.0328 19.8415C54.4458 18.7032 54.1523 17.4404 54.1523 16.0531C54.1523 14.6658 54.4725 13.4118 55.1128 12.2913C55.7531 11.153 56.6335 10.2637 57.7541 9.62336C58.8924 8.96527 60.1463 8.63623 61.5158 8.63623ZM61.5158 21.0421C62.4051 21.0421 63.2055 20.8287 63.917 20.4018C64.6462 19.9572 65.2154 19.3613 65.6245 18.6143C66.0335 17.8495 66.2381 16.9957 66.2381 16.0531C66.2381 15.1104 66.0335 14.2567 65.6245 13.4919C65.2154 12.7271 64.6462 12.1312 63.917 11.7044C63.2055 11.2597 62.4051 11.0374 61.5158 11.0374C60.6265 11.0374 59.8173 11.2597 59.088 11.7044C58.3766 12.1312 57.8074 12.7271 57.3805 13.4919C56.9715 14.2567 56.7669 15.1104 56.7669 16.0531C56.7669 16.9957 56.9715 17.8495 57.3805 18.6143C57.8074 19.3613 58.3766 19.9572 59.088 20.4018C59.8173 20.8287 60.6265 21.0421 61.5158 21.0421Z" fill="#FFFFFF"/><path d="M51.9501 15.813C51.9501 16.1509 51.8345 16.4355 51.6033 16.6667C51.372 16.8801 51.0786 16.9869 50.7228 16.9869H40.5847C40.7803 18.2319 41.3406 19.2368 42.2655 20.0016C43.2082 20.7664 44.3554 21.1488 45.7071 21.1488C46.2407 21.1488 46.7921 21.051 47.3612 20.8554C47.9482 20.6597 48.4284 20.4196 48.8019 20.135C49.0509 19.9394 49.3444 19.8415 49.6823 19.8415C50.0203 19.8415 50.2871 19.9305 50.4827 20.1083C50.8029 20.3751 50.9629 20.6775 50.9629 21.0154C50.9629 21.3356 50.8207 21.6024 50.5361 21.8158C49.9313 22.296 49.1754 22.6873 48.2683 22.9897C47.379 23.2921 46.5253 23.4432 45.7071 23.4432C44.2487 23.4432 42.9414 23.132 41.7853 22.5095C40.6292 21.8692 39.7221 20.9888 39.064 19.8682C38.4237 18.7477 38.1035 17.476 38.1035 16.0531C38.1035 14.6302 38.4059 13.3585 39.0106 12.2379C39.6331 11.0996 40.4869 10.2192 41.5718 9.59668C42.6746 8.95638 43.9196 8.63623 45.3069 8.63623C46.6765 8.63623 47.8593 8.9386 48.8553 9.54333C49.8513 10.1481 50.6161 10.9929 51.1497 12.0779C51.6833 13.1628 51.9501 14.4079 51.9501 15.813ZM45.3069 10.9307C44.0085 10.9307 42.9503 11.2864 42.1321 11.9978C41.3317 12.7093 40.8248 13.6608 40.6114 14.8525H49.4956C49.3355 13.6608 48.8909 12.7093 48.1616 11.9978C47.4324 11.2864 46.4808 10.9307 45.3069 10.9307Z" fill="#FFFFFF"/><path d="M34.4059 20.5619C34.7972 20.5619 35.1262 20.6953 35.393 20.9621C35.6598 21.2289 35.7932 21.5579 35.7932 21.9492C35.7932 22.3405 35.6598 22.6696 35.393 22.9364C35.1262 23.2031 34.7972 23.3365 34.4059 23.3365H23.3606C22.9693 23.3365 22.6403 23.2031 22.3735 22.9364C22.1245 22.6696 22 22.3405 22 21.9492V3.88732C22 3.49603 22.1334 3.16698 22.4002 2.90019C22.667 2.6334 22.9871 2.5 23.3606 2.5C23.7519 2.5 24.081 2.6334 24.3478 2.90019C24.6146 3.16698 24.748 3.49603 24.748 3.88732V20.5619H34.4059Z" fill="#FFFFFF"/></g><defs><clipPath id="clip0_header"><rect width="159" height="25" fill="white" transform="translate(0 0.5)"/></clipPath></defs></svg>
+            <div class="header-info">
+                <span class="header-badge">Quiz</span>
+                <span class="header-title" id="headerTitle">Lekcja 01: Przykładowy Quiz</span>
+            </div>
+        </header>
+
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <div class="start-card">
+                <div class="start-icon">📝</div>
+                <h1 class="start-title" id="startTitle">Przykładowy Quiz</h1>
+                <p class="start-description" id="startDescription">Quiz demonstracyjny pokazujący możliwości szablonu</p>
+
+                <div class="start-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">❓</div>
+                        <span><strong id="questionCount">5</strong> pytań</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🎯</div>
+                        <span>Próg zaliczenia: <strong id="passingScoreDisplay">70</strong>%</span>
+                    </div>
+                </div>
+
+                <!-- Continue from saved progress -->
+                <div class="continue-section hidden" id="continueSection">
+                    <div class="continue-card">
+                        <div class="continue-title">💾 Znaleziono zapisany postęp</div>
+                        <div class="continue-info">
+                            <span>Email: <strong id="savedEmail">-</strong></span>
+                            <span>Postęp: <strong id="savedProgress">-</strong></span>
+                        </div>
+                        <div class="continue-buttons">
+                            <button class="btn btn-primary" onclick="continueQuiz()">Kontynuuj →</button>
+                            <button class="btn btn-outline" onclick="startFresh()">Zacznij od nowa</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="email-form" id="emailForm">
+                    <label class="email-label" for="userEmail">Podaj swój adres email, aby rozpocząć:</label>
+                    <input type="email" id="userEmail" class="email-input" placeholder="twoj@email.com" autocomplete="email">
+                    <div class="email-error" id="emailError">Proszę podać prawidłowy adres email</div>
+                    <button class="btn btn-primary start-btn" onclick="startQuiz()">Rozpocznij quiz →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-screen hidden" id="quizScreen">
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span class="progress-counter">Pytanie <strong id="currentNum">1</strong> z <strong id="totalNum">5</strong></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <span class="question-number" id="questionNumber">Pytanie 1</span>
+                <p class="question-text" id="questionText"></p>
+                <pre class="question-code" id="questionCode" style="display: none;"><code id="codeContent"></code></pre>
+                <div class="options-list" id="optionsContainer"></div>
+
+                <div class="navigation-buttons">
+                    <div class="nav-left">
+                        <button class="btn btn-outline" id="prevBtn" onclick="previousQuestion()">&#8592; Poprzednie</button>
+                    </div>
+                    <div class="nav-right">
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Następne &#8594;</button>
+                        <button class="btn btn-primary hidden" id="finishBtn" onclick="finishQuiz()">Zakończ quiz &#10003;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-header">
+                <span class="results-badge">Wynik testu</span>
+                <div class="results-score" id="scoreValue">0%</div>
+                <div class="results-label">Twój wynik</div>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="correctCount">0</div>
+                        <div class="stat-label">Poprawnych</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="incorrectCount">0</div>
+                        <div class="stat-label">Błędnych</div>
+                    </div>
+                </div>
+                <div class="pass-status" id="passStatus"></div>
+            </div>
+
+            <div class="topic-results" id="topicResults">
+                <h3 class="topic-results-title">Wyniki według tematów</h3>
+                <div id="topicScoresContainer"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="restartBtn" onclick="restartQuiz()">&#8634; Rozpocznij ponownie</button>
+                <button class="btn btn-outline" id="reviewBtn" onclick="showReview()">&#128270; Przejrzyj odpowiedzi</button>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div class="results-screen" id="reviewScreen">
+            <div class="review-section">
+                <h2 class="review-title">Przegląd odpowiedzi</h2>
+                <div class="review-list" id="reviewContainer"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="restartQuiz()">&#8634; Rozpocznij ponownie</button>
+                <button class="btn btn-outline" onclick="backToResults()">&#8592; Powrót do wyników</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="document-footer">
+            <div class="footer-logo">
+                <svg width="100" height="17" viewBox="0 0 159 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_footer)"><path d="M149.406 23.7717C149.096 23.7717 148.681 23.6701 148.474 23.3652C147.956 22.8571 147.956 22.0441 148.474 21.5359L155.93 14.2188L148.474 6.90179C147.956 6.39366 147.956 5.58063 148.474 5.0725C148.992 4.56437 149.82 4.56437 150.338 5.0725L158.726 13.3042C158.933 13.5075 159.14 13.914 159.14 14.2188C159.14 14.5237 159.037 14.9302 158.726 15.1335L150.338 23.3652C150.131 23.5684 149.717 23.7717 149.406 23.7717Z" fill="#FFDA17"/><path d="M12.1147 23.7717C11.804 23.7717 11.3898 23.6701 11.1827 23.3652L2.79506 15.1335C2.58796 14.9302 2.38086 14.5237 2.38086 14.2188C2.38086 13.914 2.4844 13.5075 2.79506 13.3042L11.1827 5.0725C11.7005 4.56437 12.5289 4.56437 13.0467 5.0725C13.5644 5.58063 13.5644 6.39366 13.0467 6.90179L5.59095 14.2188L13.0467 21.5359C13.5644 22.0441 13.5644 22.8571 13.0467 23.3652C12.8396 23.5684 12.4254 23.7717 12.1147 23.7717Z" fill="#FFDA17"/><path d="M131.284 23.7713C130.973 23.7713 130.766 23.6697 130.559 23.568C129.938 23.1615 129.834 22.3485 130.249 21.7388L142.053 5.27536C142.468 4.6656 143.296 4.56395 143.917 4.97046C144.539 5.37696 144.642 6.18999 144.228 6.79975L132.423 23.2631C132.112 23.568 131.698 23.7713 131.284 23.7713Z" fill="#FFDA17"/><path d="M128.388 2.5C128.762 2.5 129.064 2.6245 129.295 2.87351C129.544 3.10473 129.669 3.4071 129.669 3.78061C129.669 4.15412 129.544 4.46538 129.295 4.71438C129.064 4.9456 128.762 5.06121 128.388 5.06121H122.652V21.9492C122.652 22.3405 122.519 22.6696 122.252 22.9364C121.985 23.2031 121.656 23.3365 121.265 23.3365C120.873 23.3365 120.544 23.2031 120.278 22.9364C120.011 22.6696 119.877 22.3405 119.877 21.9492V5.06121H114.115C113.741 5.06121 113.43 4.9456 113.181 4.71438C112.95 4.46538 112.834 4.15412 112.834 3.78061C112.834 3.4071 112.95 3.10473 113.181 2.87351C113.43 2.6245 113.741 2.5 114.115 2.5H128.388Z" fill="#FFFFFF"/><path d="M107 3.88732C107 3.47824 107.133 3.1492 107.4 2.90019C107.667 2.6334 107.996 2.5 108.387 2.5C108.796 2.5 109.125 2.6334 109.374 2.90019C109.641 3.1492 109.775 3.47824 109.775 3.88732V21.9492C109.775 22.3405 109.641 22.6696 109.374 22.9364C109.125 23.2031 108.796 23.3365 108.387 23.3365C107.996 23.3365 107.667 23.2031 107.4 22.9364C107.133 22.6696 107 22.3405 107 21.9492V3.88732Z" fill="#FFFFFF"/><path d="M93.1347 8.6095C94.362 8.6095 95.4647 8.87629 96.4429 9.40988C97.4212 9.94346 98.186 10.7261 98.7374 11.7577C99.2887 12.7715 99.5644 13.9987 99.5644 15.4394V22.0025C99.5644 22.3938 99.431 22.7229 99.1642 22.9896C98.9152 23.2387 98.5951 23.3632 98.2038 23.3632C97.8125 23.3632 97.4834 23.2387 97.2166 22.9896C96.9676 22.7229 96.8431 22.3938 96.8431 22.0025V15.4394C96.8431 13.9987 96.4518 12.9138 95.6692 12.1845C94.9044 11.4375 93.8817 11.064 92.6011 11.064C91.8541 11.064 91.1693 11.2152 90.5468 11.5175C89.9421 11.8199 89.4618 12.229 89.1061 12.7448C88.7682 13.2606 88.5992 13.8386 88.5992 14.4789V22.0025C88.5992 22.3938 88.4747 22.7229 88.2257 22.9896C87.9767 23.2387 87.6477 23.3632 87.2386 23.3632C86.8473 23.3632 86.5182 23.2387 86.2514 22.9896C86.0024 22.7229 85.8779 22.3938 85.8779 22.0025V10.1035C85.8779 9.69446 86.0024 9.36541 86.2514 9.1164C86.5182 8.8674 86.8473 8.74289 87.2386 8.74289C87.6477 8.74289 87.9767 8.8674 88.2257 9.1164C88.4747 9.36541 88.5992 9.69446 88.5992 10.1035V10.397C89.1684 9.82785 89.8443 9.39209 90.6268 9.08972C91.4094 8.76957 92.2454 8.6095 93.1347 8.6095Z" fill="#FFFFFF"/><path d="M80.0534 8.58289C80.996 8.58289 81.7342 8.72518 82.2678 9.00976C82.8013 9.29433 83.0681 9.65006 83.0681 10.0769C83.0681 10.2014 83.0592 10.2904 83.0415 10.3437C82.8814 10.9129 82.5257 11.1975 81.9743 11.1975C81.8854 11.1975 81.752 11.1797 81.5741 11.1441C80.8627 11.0196 80.2846 10.9573 79.8399 10.9573C78.5593 10.9573 77.5277 11.2508 76.7451 11.8378C75.9625 12.4247 75.5713 13.2162 75.5713 14.2122V22.0026C75.5713 22.4295 75.4556 22.7585 75.2244 22.9897C75.011 23.2209 74.6819 23.3365 74.2373 23.3365C73.8104 23.3365 73.4814 23.2298 73.2502 23.0164C73.0189 22.7852 72.9033 22.4472 72.9033 22.0026V10.0769C72.9033 9.65006 73.0189 9.32101 73.2502 9.08979C73.4814 8.85857 73.8104 8.74296 74.2373 8.74296C75.1266 8.74296 75.5713 9.18762 75.5713 10.0769V10.5838C76.1048 9.96132 76.7629 9.4722 77.5455 9.11647C78.3281 8.76075 79.1641 8.58289 80.0534 8.58289Z" fill="#FFFFFF"/><path d="M61.5158 8.63623C62.8854 8.63623 64.1215 8.96527 65.2243 9.62336C66.3448 10.2637 67.2252 11.153 67.8655 12.2913C68.5236 13.4118 68.8526 14.6658 68.8526 16.0531V22.0026C68.8526 22.3939 68.7193 22.7229 68.4525 22.9897C68.2035 23.2387 67.8833 23.3632 67.492 23.3632C67.1007 23.3632 66.7717 23.2387 66.5049 22.9897C66.2559 22.7229 66.1314 22.3939 66.1314 22.0026V21.0154C65.5088 21.7802 64.7529 22.3761 63.8636 22.8029C62.9743 23.2298 62.0139 23.4432 60.9823 23.4432C59.7016 23.4432 58.5366 23.1231 57.4873 22.4828C56.4557 21.8425 55.6375 20.9621 55.0328 19.8415C54.4458 18.7032 54.1523 17.4404 54.1523 16.0531C54.1523 14.6658 54.4725 13.4118 55.1128 12.2913C55.7531 11.153 56.6335 10.2637 57.7541 9.62336C58.8924 8.96527 60.1463 8.63623 61.5158 8.63623ZM61.5158 21.0421C62.4051 21.0421 63.2055 20.8287 63.917 20.4018C64.6462 19.9572 65.2154 19.3613 65.6245 18.6143C66.0335 17.8495 66.2381 16.9957 66.2381 16.0531C66.2381 15.1104 66.0335 14.2567 65.6245 13.4919C65.2154 12.7271 64.6462 12.1312 63.917 11.7044C63.2055 11.2597 62.4051 11.0374 61.5158 11.0374C60.6265 11.0374 59.8173 11.2597 59.088 11.7044C58.3766 12.1312 57.8074 12.7271 57.3805 13.4919C56.9715 14.2567 56.7669 15.1104 56.7669 16.0531C56.7669 16.9957 56.9715 17.8495 57.3805 18.6143C57.8074 19.3613 58.3766 19.9572 59.088 20.4018C59.8173 20.8287 60.6265 21.0421 61.5158 21.0421Z" fill="#FFFFFF"/><path d="M51.9501 15.813C51.9501 16.1509 51.8345 16.4355 51.6033 16.6667C51.372 16.8801 51.0786 16.9869 50.7228 16.9869H40.5847C40.7803 18.2319 41.3406 19.2368 42.2655 20.0016C43.2082 20.7664 44.3554 21.1488 45.7071 21.1488C46.2407 21.1488 46.7921 21.051 47.3612 20.8554C47.9482 20.6597 48.4284 20.4196 48.8019 20.135C49.0509 19.9394 49.3444 19.8415 49.6823 19.8415C50.0203 19.8415 50.2871 19.9305 50.4827 20.1083C50.8029 20.3751 50.9629 20.6775 50.9629 21.0154C50.9629 21.3356 50.8207 21.6024 50.5361 21.8158C49.9313 22.296 49.1754 22.6873 48.2683 22.9897C47.379 23.2921 46.5253 23.4432 45.7071 23.4432C44.2487 23.4432 42.9414 23.132 41.7853 22.5095C40.6292 21.8692 39.7221 20.9888 39.064 19.8682C38.4237 18.7477 38.1035 17.476 38.1035 16.0531C38.1035 14.6302 38.4059 13.3585 39.0106 12.2379C39.6331 11.0996 40.4869 10.2192 41.5718 9.59668C42.6746 8.95638 43.9196 8.63623 45.3069 8.63623C46.6765 8.63623 47.8593 8.9386 48.8553 9.54333C49.8513 10.1481 50.6161 10.9929 51.1497 12.0779C51.6833 13.1628 51.9501 14.4079 51.9501 15.813ZM45.3069 10.9307C44.0085 10.9307 42.9503 11.2864 42.1321 11.9978C41.3317 12.7093 40.8248 13.6608 40.6114 14.8525H49.4956C49.3355 13.6608 48.8909 12.7093 48.1616 11.9978C47.4324 11.2864 46.4808 10.9307 45.3069 10.9307Z" fill="#FFFFFF"/><path d="M34.4059 20.5619C34.7972 20.5619 35.1262 20.6953 35.393 20.9621C35.6598 21.2289 35.7932 21.5579 35.7932 21.9492C35.7932 22.3405 35.6598 22.6696 35.393 22.9364C35.1262 23.2031 34.7972 23.3365 34.4059 23.3365H23.3606C22.9693 23.3365 22.6403 23.2031 22.3735 22.9364C22.1245 22.6696 22 22.3405 22 21.9492V3.88732C22 3.49603 22.1334 3.16698 22.4002 2.90019C22.667 2.6334 22.9871 2.5 23.3606 2.5C23.7519 2.5 24.081 2.6334 24.3478 2.90019C24.6146 3.16698 24.748 3.49603 24.748 3.88732V20.5619H34.4059Z" fill="#FFFFFF"/></g><defs><clipPath id="clip0_footer"><rect width="159" height="25" fill="white" transform="translate(0 0.5)"/></clipPath></defs></svg>
+                <span style="margin-left: 5px; font-size: 0.8rem; color: var(--color-gray);">sp. z o.o.</span>
+            </div>
+            <div class="footer-contacts">
+                <div class="footer-contact"><span>&#128222;</span><a href="tel:+48573580990">+48 573-580-990</a></div>
+                <div class="footer-contact"><span>&#127760;</span><a href="https://learnit.com.pl">learnit.com.pl</a></div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ==========================================
+        // QUIZ DATA - Replace this with your content
+        // ==========================================
+        const quizData = {
+            meta: {
+                title: "Przykładowy Quiz",
+                description: "Quiz demonstracyjny pokazujący możliwości szablonu",
+                course: "LearnIT Demo",
+                lessonNumber: "01",
+                author: "LearnIT"
+            },
+            questions: [
+                {
+                    id: 1,
+                    question: "Czym jest kontener Docker?",
+                    code: null,
+                    type: "multiple",
+                    options: [
+                        {
+                            key: "A",
+                            text: "Maszyną wirtualną z własnym systemem operacyjnym",
+                            explanation: "Niepoprawnie. Kontener NIE jest maszyną wirtualną - nie ma własnego systemu operacyjnego, współdzieli kernel z hostem."
+                        },
+                        {
+                            key: "B",
+                            text: "Lekkim, izolowanym środowiskiem zawierającym aplikację i jej zależności",
+                            explanation: "Poprawnie! Kontener to lekkie środowisko, które izoluje aplikację wraz z jej zależnościami, zapewniając spójne działanie."
+                        },
+                        {
+                            key: "C",
+                            text: "Katalogiem z kodem źródłowym aplikacji",
+                            explanation: "Niepoprawnie. Kontener to środowisko uruchomieniowe, nie katalog z kodem. Kod może być częścią kontenera, ale to nie jego definicja."
+                        },
+                        {
+                            key: "D",
+                            text: "Narzędziem do kompresji plików",
+                            explanation: "Niepoprawnie. Docker nie służy do kompresji plików - to platforma do konteneryzacji aplikacji."
+                        }
+                    ],
+                    correctAnswer: "B",
+                    topic: "Podstawy Docker"
+                },
+                {
+                    id: 2,
+                    question: "Które polecenie służy do pobrania obrazu z Docker Hub?",
+                    code: null,
+                    type: "multiple",
+                    options: [
+                        {
+                            key: "A",
+                            text: "docker get nginx",
+                            explanation: "Niepoprawnie. Polecenie 'docker get' nie istnieje w Docker CLI."
+                        },
+                        {
+                            key: "B",
+                            text: "docker download nginx",
+                            explanation: "Niepoprawnie. Polecenie 'docker download' nie istnieje. Docker używa terminologii 'pull' dla pobierania."
+                        },
+                        {
+                            key: "C",
+                            text: "docker pull nginx",
+                            explanation: "Poprawnie! 'docker pull' to standardowe polecenie do pobierania obrazów z rejestru Docker."
+                        },
+                        {
+                            key: "D",
+                            text: "docker fetch nginx",
+                            explanation: "Niepoprawnie. 'docker fetch' nie istnieje. Prawidłowe polecenie to 'docker pull'."
+                        }
+                    ],
+                    correctAnswer: "C",
+                    topic: "Komendy Docker"
+                },
+                {
+                    id: 3,
+                    question: "Co oznacza flaga '-d' w poniższym poleceniu?",
+                    code: "docker run -d nginx",
+                    type: "multiple",
+                    options: [
+                        {
+                            key: "A",
+                            text: "Uruchomienie w trybie debugowania",
+                            explanation: "Niepoprawnie. Flaga '-d' nie oznacza debugowania. Do debugowania używa się innych narzędzi."
+                        },
+                        {
+                            key: "B",
+                            text: "Usunięcie kontenera po zakończeniu",
+                            explanation: "Niepoprawnie. To robi flaga '--rm', nie '-d'."
+                        },
+                        {
+                            key: "C",
+                            text: "Uruchomienie w trybie tła (detached)",
+                            explanation: "Poprawnie! Flaga '-d' (detached) uruchamia kontener w tle, nie blokując terminala."
+                        },
+                        {
+                            key: "D",
+                            text: "Uruchomienie z podwyższonymi uprawnieniami",
+                            explanation: "Niepoprawnie. Do podwyższonych uprawnień używa się '--privileged', nie '-d'."
+                        }
+                    ],
+                    correctAnswer: "C",
+                    topic: "Komendy Docker"
+                },
+                {
+                    id: 4,
+                    question: "Dockerfile rozpoczyna się od instrukcji FROM. Prawda czy fałsz?",
+                    code: null,
+                    type: "boolean",
+                    options: [
+                        {
+                            key: "A",
+                            text: "Prawda",
+                            explanation: "Poprawnie! Każdy Dockerfile musi rozpoczynać się od instrukcji FROM, która określa bazowy obraz."
+                        },
+                        {
+                            key: "B",
+                            text: "Fałsz",
+                            explanation: "Niepoprawnie. FROM jest wymagane jako pierwsza instrukcja w Dockerfile (z wyjątkiem ARG przed FROM)."
+                        }
+                    ],
+                    correctAnswer: "A",
+                    topic: "Dockerfile"
+                },
+                {
+                    id: 5,
+                    question: "Która instrukcja w Dockerfile służy do kopiowania plików z hosta do obrazu?",
+                    code: null,
+                    type: "multiple",
+                    options: [
+                        {
+                            key: "A",
+                            text: "MOVE",
+                            explanation: "Niepoprawnie. Instrukcja MOVE nie istnieje w Dockerfile."
+                        },
+                        {
+                            key: "B",
+                            text: "COPY",
+                            explanation: "Poprawnie! COPY kopiuje pliki z kontekstu budowania do obrazu. Jest preferowana dla prostego kopiowania."
+                        },
+                        {
+                            key: "C",
+                            text: "TRANSFER",
+                            explanation: "Niepoprawnie. Instrukcja TRANSFER nie istnieje w Dockerfile."
+                        },
+                        {
+                            key: "D",
+                            text: "ADD",
+                            explanation: "Częściowo poprawnie, ale COPY jest preferowane. ADD ma dodatkowe funkcje (rozpakowywanie, URL), ale COPY jest bardziej przejrzyste."
+                        }
+                    ],
+                    correctAnswer: "B",
+                    topic: "Dockerfile"
+                }
+            ],
+            settings: {
+                shuffleQuestions: false,
+                showExplanationsAfterEach: false,
+                passingScore: 70
+            }
+        };
+
+        // ==========================================
+        // QUIZ LOGIC (DO NOT MODIFY)
+        // ==========================================
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = null;
+        let userAnswers = [];
+        let quizFinished = false;
+        let userEmail = '';
+        let continueFromSaved = false;
+
+        // ==========================================
+        // LOCAL STORAGE FUNCTIONS
+        // ==========================================
+
+        function getQuizStorageKey() {
+            // Create unique key based on quiz title (sanitized)
+            const sanitized = quizData.meta.title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            return `quiz_progress_${sanitized}`;
+        }
+
+        function saveProgress() {
+            const progressData = {
+                email: userEmail,
+                answers: userAnswers.map(a => {
+                    // Convert option key (A,B,C,D) to index (0,1,2,3) for compact storage
+                    if (a === null) return null;
+                    return a.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                }),
+                currentIndex: currentQuestionIndex,
+                timestamp: Date.now()
+            };
+            try {
+                localStorage.setItem(getQuizStorageKey(), JSON.stringify(progressData));
+            } catch (e) {
+                console.warn('Could not save progress to localStorage:', e);
+            }
+        }
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem(getQuizStorageKey());
+                if (!saved) return null;
+                const data = JSON.parse(saved);
+                // Convert indices back to keys
+                data.answers = data.answers.map(a => {
+                    if (a === null) return null;
+                    return String.fromCharCode(65 + a); // 0=A, 1=B, 2=C, 3=D
+                });
+                return data;
+            } catch (e) {
+                console.warn('Could not load progress from localStorage:', e);
+                return null;
+            }
+        }
+
+        function clearProgress() {
+            try {
+                localStorage.removeItem(getQuizStorageKey());
+            } catch (e) {
+                console.warn('Could not clear progress from localStorage:', e);
+            }
+        }
+
+        function hasStoredProgress() {
+            const progress = loadProgress();
+            if (!progress) return false;
+            // Check if progress is valid (has answers and not too old - 7 days)
+            const weekInMs = 7 * 24 * 60 * 60 * 1000;
+            if (Date.now() - progress.timestamp > weekInMs) {
+                clearProgress();
+                return false;
+            }
+            // Check if any questions were answered
+            return progress.answers.some(a => a !== null);
+        }
+
+        function getProgressSummary() {
+            const progress = loadProgress();
+            if (!progress) return null;
+            const answeredCount = progress.answers.filter(a => a !== null).length;
+            return {
+                email: progress.email,
+                answered: answeredCount,
+                total: quizData.questions.length,
+                currentIndex: progress.currentIndex
+            };
+        }
+
+        // Initialize start screen
+        function initStartScreen() {
+            // Set page title
+            document.title = `Quiz: ${quizData.meta.title} | LearnIT`;
+            document.getElementById('headerTitle').textContent =
+                `Lekcja ${quizData.meta.lessonNumber}: ${quizData.meta.title}`;
+
+            // Populate start screen
+            document.getElementById('startTitle').textContent = quizData.meta.title;
+            document.getElementById('startDescription').textContent = quizData.meta.description;
+            document.getElementById('questionCount').textContent = quizData.questions.length;
+            document.getElementById('passingScoreDisplay').textContent = quizData.settings.passingScore;
+
+            // Check for saved progress
+            const continueSection = document.getElementById('continueSection');
+            if (hasStoredProgress()) {
+                const summary = getProgressSummary();
+                document.getElementById('savedEmail').textContent = summary.email;
+                document.getElementById('savedProgress').textContent =
+                    `${summary.answered} z ${summary.total} pytań`;
+                document.getElementById('userEmail').value = summary.email;
+                continueSection.classList.remove('hidden');
+            } else {
+                continueSection.classList.add('hidden');
+            }
+
+            // Add enter key listener for email input
+            document.getElementById('userEmail').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startQuiz();
+                }
+            });
+        }
+
+        // Validate email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Start quiz after email validation
+        function startQuiz() {
+            const emailInput = document.getElementById('userEmail');
+            const emailError = document.getElementById('emailError');
+            const email = emailInput.value.trim();
+
+            if (!isValidEmail(email)) {
+                emailInput.classList.add('error');
+                emailError.classList.add('show');
+                emailInput.focus();
+                return;
+            }
+
+            // Valid email - store and start quiz
+            userEmail = email;
+            emailInput.classList.remove('error');
+            emailError.classList.remove('show');
+
+            // Hide start screen, show quiz
+            document.getElementById('startScreen').classList.add('hidden');
+            initQuiz();
+        }
+
+        // Continue quiz from saved progress
+        function continueQuiz() {
+            const progress = loadProgress();
+            if (!progress) {
+                // No progress found, start fresh
+                startFresh();
+                return;
+            }
+
+            userEmail = progress.email;
+            continueFromSaved = true;
+
+            // Hide start screen, show quiz
+            document.getElementById('startScreen').classList.add('hidden');
+            initQuiz();
+
+            // Restore saved answers
+            userAnswers = progress.answers.slice();
+
+            // Ensure userAnswers array has correct length
+            while (userAnswers.length < quizData.questions.length) {
+                userAnswers.push(null);
+            }
+
+            // Go to last answered question or first unanswered
+            let targetIndex = 0;
+            for (let i = userAnswers.length - 1; i >= 0; i--) {
+                if (userAnswers[i] !== null) {
+                    targetIndex = Math.min(i + 1, quizData.questions.length - 1);
+                    break;
+                }
+            }
+
+            currentQuestionIndex = targetIndex;
+            showQuestion(currentQuestionIndex);
+            updateProgress();
+
+            continueFromSaved = false;
+        }
+
+        // Start fresh - clear saved progress
+        function startFresh() {
+            clearProgress();
+            document.getElementById('continueSection').classList.add('hidden');
+
+            // Focus on email input
+            document.getElementById('userEmail').focus();
+        }
+
+        // Initialize quiz
+        function initQuiz() {
+            document.getElementById('totalNum').textContent = quizData.questions.length;
+
+            // Shuffle questions if enabled
+            if (quizData.settings.shuffleQuestions) {
+                quizData.questions = shuffleArray(quizData.questions);
+            }
+
+            // Reset state
+            currentQuestionIndex = 0;
+            selectedAnswer = null;
+            userAnswers = new Array(quizData.questions.length).fill(null);
+            quizFinished = false;
+
+            // Show first question
+            showQuestion(0);
+            updateProgress();
+            updateNavigation();
+
+            // Show quiz screen
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('reviewScreen').classList.remove('active');
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function showQuestion(index) {
+            const question = quizData.questions[index];
+            selectedAnswer = userAnswers[index];
+
+            document.getElementById('currentNum').textContent = index + 1;
+            document.getElementById('questionNumber').textContent = `Pytanie ${index + 1}`;
+            document.getElementById('questionText').textContent = question.question;
+
+            // Show code if present
+            const codeBlock = document.getElementById('questionCode');
+            const codeContent = document.getElementById('codeContent');
+            if (question.code) {
+                codeContent.textContent = question.code;
+                codeBlock.style.display = 'block';
+                Prism.highlightElement(codeContent);
+            } else {
+                codeBlock.style.display = 'none';
+            }
+
+            // Render options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach(option => {
+                const isSelected = selectedAnswer === option.key;
+                const optionEl = document.createElement('div');
+                optionEl.className = `option-item${isSelected ? ' selected' : ''}`;
+                optionEl.dataset.key = option.key;
+                optionEl.innerHTML = `
+                    <div class="option-key">${option.key}</div>
+                    <div class="option-content">
+                        <div class="option-text">${option.text}</div>
+                        <div class="option-explanation">${option.explanation}</div>
+                    </div>
+                `;
+                optionEl.addEventListener('click', () => selectOption(option.key));
+                optionsContainer.appendChild(optionEl);
+            });
+
+            updateNavigation();
+        }
+
+        function selectOption(key) {
+            if (quizFinished) return;
+
+            selectedAnswer = key;
+            userAnswers[currentQuestionIndex] = key;
+
+            // Update UI
+            document.querySelectorAll('.option-item').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.key === key);
+            });
+
+            // Save progress to localStorage
+            saveProgress();
+
+            updateNavigation();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+
+            // Previous button
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+
+            // Next/Finish buttons
+            const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1;
+            nextBtn.classList.toggle('hidden', isLastQuestion);
+            finishBtn.classList.toggle('hidden', !isLastQuestion);
+
+            // Disable if no answer selected
+            nextBtn.disabled = !selectedAnswer;
+            finishBtn.disabled = !selectedAnswer;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        function finishQuiz() {
+            quizFinished = true;
+            // Clear saved progress - quiz is completed
+            clearProgress();
+            showResults();
+        }
+
+        function showResults() {
+            // Calculate scores
+            let correctCount = 0;
+            const topicScores = {};
+
+            quizData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+
+                if (isCorrect) correctCount++;
+
+                // Track by topic
+                if (!topicScores[q.topic]) {
+                    topicScores[q.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[q.topic].total++;
+                if (isCorrect) topicScores[q.topic].correct++;
+            });
+
+            const totalQuestions = quizData.questions.length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            // Update UI
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('active');
+
+            // Score
+            const scoreEl = document.getElementById('scoreValue');
+            scoreEl.textContent = percentage + '%';
+            scoreEl.className = 'results-score';
+            if (percentage >= 80) scoreEl.classList.add('score-high');
+            else if (percentage >= 50) scoreEl.classList.add('score-medium');
+            else scoreEl.classList.add('score-low');
+
+            // Counts
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = totalQuestions - correctCount;
+
+            // Pass/Fail status
+            const passStatus = document.getElementById('passStatus');
+            const passed = percentage >= quizData.settings.passingScore;
+            passStatus.innerHTML = passed ? '✓ Zaliczono!' : '✗ Nie zaliczono';
+            passStatus.className = `pass-status ${passed ? 'passed' : 'failed'}`;
+
+            // Topic scores
+            const topicContainer = document.getElementById('topicScoresContainer');
+            topicContainer.innerHTML = '';
+
+            Object.entries(topicScores).forEach(([topic, scores]) => {
+                const topicPercent = Math.round((scores.correct / scores.total) * 100);
+                const color = topicPercent >= 80 ? 'var(--color-success)' :
+                             topicPercent >= 50 ? 'var(--color-warning)' : 'var(--color-error)';
+
+                topicContainer.innerHTML += `
+                    <div class="topic-item">
+                        <span class="topic-name">${topic}</span>
+                        <div class="topic-score-container">
+                            <div class="topic-bar">
+                                <div class="topic-bar-fill" style="width: ${topicPercent}%; background: ${color};"></div>
+                            </div>
+                            <span class="topic-score-text">${scores.correct}/${scores.total} (${topicPercent}%)</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showReview() {
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('reviewScreen').classList.add('active');
+
+            const reviewContainer = document.getElementById('reviewContainer');
+            reviewContainer.innerHTML = '';
+
+            quizData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                const userOption = q.options.find(o => o.key === userAnswer);
+                const correctOption = q.options.find(o => o.key === q.correctAnswer);
+
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+
+                let answersHtml = `
+                    <div class="review-answer ${isCorrect ? 'user-correct' : 'user-incorrect'}">
+                        <span class="review-answer-icon">${isCorrect ? '&#10003;' : '&#10007;'}</span>
+                        <span>Twoja odpowiedź: <strong>${userAnswer}.</strong> ${userOption ? userOption.text : 'Brak odpowiedzi'}</span>
+                    </div>
+                `;
+
+                if (!isCorrect) {
+                    answersHtml += `
+                        <div class="review-answer correct-answer">
+                            <span class="review-answer-icon">&#10003;</span>
+                            <span>Poprawna odpowiedź: <strong>${q.correctAnswer}.</strong> ${correctOption.text}</span>
+                        </div>
+                    `;
+                }
+
+                reviewItem.innerHTML = `
+                    <div class="review-header">
+                        <div class="review-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '&#10003;' : '&#10007;'}</div>
+                        <div class="review-question">${index + 1}. ${q.question}</div>
+                    </div>
+                    <div class="review-answers">${answersHtml}</div>
+                    <div class="review-explanation">
+                        <div class="explanation-title">&#128161; Wyjaśnienie</div>
+                        <div class="explanation-text">${userOption ? userOption.explanation : correctOption.explanation}</div>
+                    </div>
+                `;
+                reviewContainer.appendChild(reviewItem);
+            });
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+        }
+
+        function restartQuiz() {
+            // Clear saved progress when restarting
+            clearProgress();
+            initQuiz();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initStartScreen);
+    </script>
+</body>
+</html>
