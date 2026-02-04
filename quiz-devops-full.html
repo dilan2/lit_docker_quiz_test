@@ -1,0 +1,3172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz | LearnIT</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Prism.js Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+
+    <style>
+        :root {
+            --color-primary: #FFD700;
+            --color-primary-dark: #E6C200;
+            --color-dark: #1a1a1a;
+            --color-dark-secondary: #2d2d2d;
+            --color-gray: #6b7280;
+            --color-gray-light: #f3f4f6;
+            --color-white: #ffffff;
+            --color-success: #22c55e;
+            --color-error: #ef4444;
+            --color-warning: #f59e0b;
+            --color-info: #3b82f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --border-radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font-family);
+            line-height: 1.7;
+            color: var(--color-dark);
+            background: var(--color-white);
+            min-height: 100vh;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+        /* Page Header */
+        .page-header {
+            background: var(--color-dark);
+            color: var(--color-white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0 30px 0;
+            border-radius: var(--border-radius);
+        }
+
+        .header-info { display: flex; align-items: center; gap: 15px; }
+
+        .header-badge {
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title { font-size: 0.9rem; color: #a1a1aa; }
+
+        /* Progress Section */
+        .progress-section { margin-bottom: 30px; }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-counter { font-size: 0.9rem; color: var(--color-gray); }
+        .progress-counter strong { color: var(--color-dark); font-weight: 700; }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--color-gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-dark);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .question-code {
+            background: var(--color-dark);
+            color: #e5e5e5;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin-bottom: 25px;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Options */
+        .options-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px 20px;
+            background: var(--color-gray-light);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover:not(.disabled) { background: #e8e8e8; border-color: var(--color-gray); }
+        .option-item.selected { background: #fffbeb; border-color: var(--color-primary); }
+        .option-item.correct { background: #f0fdf4; border-color: var(--color-success); }
+        .option-item.incorrect { background: #fef2f2; border-color: var(--color-error); }
+        .option-item.disabled { cursor: default; }
+
+        .option-key {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-white);
+            border: 2px solid var(--color-gray);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--color-dark);
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .option-item.selected .option-key {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-dark);
+        }
+
+        .option-item.correct .option-key {
+            background: var(--color-success);
+            border-color: var(--color-success);
+            color: var(--color-white);
+        }
+
+        .option-item.incorrect .option-key {
+            background: var(--color-error);
+            border-color: var(--color-error);
+            color: var(--color-white);
+        }
+
+        .option-content { flex: 1; }
+        .option-text { font-size: 1rem; line-height: 1.5; padding-top: 4px; color: var(--color-dark); }
+
+        .option-explanation {
+            margin-top: 10px;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+            display: none;
+        }
+
+        .option-explanation.show { display: block; }
+
+        .option-item.correct .option-explanation {
+            background: rgba(34, 197, 94, 0.1);
+            color: #166534;
+        }
+
+        .option-item.incorrect .option-explanation {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--color-primary); color: var(--color-dark); }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-secondary { background: var(--color-dark); color: var(--color-white); }
+        .btn-secondary:hover { background: var(--color-dark-secondary); transform: translateY(-2px); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--color-dark);
+            border: 2px solid var(--color-gray);
+        }
+        .btn-outline:hover {
+            border-color: var(--color-dark);
+            background: var(--color-gray-light);
+        }
+
+        .btn-full { width: 100%; }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-left { flex: 1; }
+        .nav-right { flex: 1; display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Results Screen */
+        .results-screen { display: none; }
+        .results-screen.active { display: block; }
+        .quiz-screen.hidden { display: none; }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-secondary) 100%);
+            color: var(--color-white);
+            padding: 50px 40px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: var(--color-primary);
+            opacity: 0.1;
+            border-radius: 50%;
+        }
+
+        .results-badge {
+            display: inline-block;
+            background: var(--color-primary);
+            color: var(--color-dark);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .results-score { font-size: 4rem; font-weight: 800; margin-bottom: 10px; line-height: 1; }
+        .results-score.score-high { color: var(--color-success); }
+        .results-score.score-medium { color: var(--color-primary); }
+        .results-score.score-low { color: var(--color-error); }
+
+        .results-label { font-size: 1.1rem; color: #a1a1aa; margin-bottom: 30px; }
+
+        .results-stats { display: flex; justify-content: center; gap: 50px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--color-white); }
+        .stat-label { font-size: 0.75rem; color: #71717a; text-transform: uppercase; letter-spacing: 1px; }
+
+        .pass-status {
+            margin-top: 25px;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pass-status.passed { background: rgba(34, 197, 94, 0.2); color: var(--color-success); }
+        .pass-status.failed { background: rgba(239, 68, 68, 0.2); color: var(--color-error); }
+
+        /* Topic Results */
+        .topic-results {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .topic-results-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-gray-light);
+        }
+
+        .topic-item:last-child { border-bottom: none; }
+
+        .topic-name { font-weight: 600; color: var(--color-dark); }
+
+        .topic-score-container { display: flex; align-items: center; gap: 15px; }
+
+        .topic-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--color-gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .topic-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .topic-score-text { font-size: 0.9rem; color: var(--color-gray); min-width: 70px; text-align: right; }
+
+        /* Review Section */
+        .review-section { margin-bottom: 30px; }
+
+        .review-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .review-list { display: flex; flex-direction: column; gap: 20px; }
+
+        .review-item {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            transition: all 0.2s ease;
+        }
+
+        .review-item.correct { border-left: 4px solid var(--color-success); }
+        .review-item.incorrect { border-left: 4px solid var(--color-error); }
+
+        .review-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+
+        .review-status {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .review-status.correct { background: #f0fdf4; color: var(--color-success); }
+        .review-status.incorrect { background: #fef2f2; color: var(--color-error); }
+
+        .review-question { font-weight: 600; font-size: 1rem; line-height: 1.5; color: var(--color-dark); }
+
+        .review-answers { margin-bottom: 15px; }
+
+        .review-answer {
+            font-size: 0.9rem;
+            padding: 8px 0;
+            color: var(--color-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .review-answer-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+        .review-answer.user-correct { color: var(--color-success); font-weight: 500; }
+        .review-answer.user-incorrect { color: var(--color-error); font-weight: 500; }
+        .review-answer.correct-answer { color: var(--color-success); font-weight: 500; }
+
+        .review-explanation {
+            padding: 15px 20px;
+            background: #fefce8;
+            border-left: 4px solid var(--color-primary);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .explanation-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a16207;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .explanation-text { font-size: 0.9rem; color: var(--color-dark); line-height: 1.6; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .document-footer {
+            background: var(--color-dark);
+            color: var(--color-white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px 0 40px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-logo { display: flex; align-items: center; }
+        .footer-contacts { display: flex; gap: 25px; flex-wrap: wrap; }
+
+        .footer-contact { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .footer-contact a { color: var(--color-white); text-decoration: none; transition: color 0.2s ease; }
+        .footer-contact a:hover { color: var(--color-primary); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 0 15px; }
+            .page-header { flex-direction: column; gap: 10px; text-align: center; padding: 20px; }
+            .quiz-card { padding: 25px 20px; }
+            .question-text { font-size: 1.1rem; }
+            .option-item { padding: 15px; }
+            .results-header { padding: 35px 25px; }
+            .results-score { font-size: 3rem; }
+            .results-stats { gap: 30px; }
+            .navigation-buttons { flex-direction: column; }
+            .nav-left, .nav-right { justify-content: center; }
+            .document-footer { flex-direction: column; text-align: center; }
+            .footer-contacts { justify-content: center; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons .btn { width: 100%; }
+        }
+
+        .hidden { display: none !important; }
+
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: var(--color-white);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-primary);
+        }
+
+        .fullscreen-btn span {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .fullscreen-btn span { display: none; }
+            .fullscreen-btn { padding: 8px 10px; }
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-card {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            padding: 50px 40px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .start-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2.5rem;
+        }
+
+        .start-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 10px;
+        }
+
+        .start-description {
+            font-size: 1rem;
+            color: var(--color-gray);
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+        }
+
+        .meta-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-gray-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .email-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .email-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-dark);
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            outline: none;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+
+        .email-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .email-input.error {
+            border-color: var(--color-error);
+        }
+
+        .email-error {
+            font-size: 0.85rem;
+            color: var(--color-error);
+            text-align: left;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .email-error.show {
+            display: block;
+        }
+
+        .start-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Continue Section */
+        .continue-section {
+            margin-bottom: 30px;
+        }
+
+        .continue-card {
+            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .continue-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 15px;
+        }
+
+        .continue-info {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+        }
+
+        .continue-info strong {
+            color: var(--color-dark);
+        }
+
+        .continue-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .continue-buttons .btn {
+            padding: 12px 25px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .continue-buttons {
+                flex-direction: column;
+            }
+            .continue-buttons .btn {
+                width: 100%;
+            }
+            .continue-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <svg width="100" height="17" viewBox="0 0 159 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_header)"><path d="M149.406 23.7717C149.096 23.7717 148.681 23.6701 148.474 23.3652C147.956 22.8571 147.956 22.0441 148.474 21.5359L155.93 14.2188L148.474 6.90179C147.956 6.39366 147.956 5.58063 148.474 5.0725C148.992 4.56437 149.82 4.56437 150.338 5.0725L158.726 13.3042C158.933 13.5075 159.14 13.914 159.14 14.2188C159.14 14.5237 159.037 14.9302 158.726 15.1335L150.338 23.3652C150.131 23.5684 149.717 23.7717 149.406 23.7717Z" fill="#FFDA17"/><path d="M12.1147 23.7717C11.804 23.7717 11.3898 23.6701 11.1827 23.3652L2.79506 15.1335C2.58796 14.9302 2.38086 14.5237 2.38086 14.2188C2.38086 13.914 2.4844 13.5075 2.79506 13.3042L11.1827 5.0725C11.7005 4.56437 12.5289 4.56437 13.0467 5.0725C13.5644 5.58063 13.5644 6.39366 13.0467 6.90179L5.59095 14.2188L13.0467 21.5359C13.5644 22.0441 13.5644 22.8571 13.0467 23.3652C12.8396 23.5684 12.4254 23.7717 12.1147 23.7717Z" fill="#FFDA17"/><path d="M131.284 23.7713C130.973 23.7713 130.766 23.6697 130.559 23.568C129.938 23.1615 129.834 22.3485 130.249 21.7388L142.053 5.27536C142.468 4.6656 143.296 4.56395 143.917 4.97046C144.539 5.37696 144.642 6.18999 144.228 6.79975L132.423 23.2631C132.112 23.568 131.698 23.7713 131.284 23.7713Z" fill="#FFDA17"/><path d="M128.388 2.5C128.762 2.5 129.064 2.6245 129.295 2.87351C129.544 3.10473 129.669 3.4071 129.669 3.78061C129.669 4.15412 129.544 4.46538 129.295 4.71438C129.064 4.9456 128.762 5.06121 128.388 5.06121H122.652V21.9492C122.652 22.3405 122.519 22.6696 122.252 22.9364C121.985 23.2031 121.656 23.3365 121.265 23.3365C120.873 23.3365 120.544 23.2031 120.278 22.9364C120.011 22.6696 119.877 22.3405 119.877 21.9492V5.06121H114.115C113.741 5.06121 113.43 4.9456 113.181 4.71438C112.95 4.46538 112.834 4.15412 112.834 3.78061C112.834 3.4071 112.95 3.10473 113.181 2.87351C113.43 2.6245 113.741 2.5 114.115 2.5H128.388Z" fill="#FFFFFF"/><path d="M107 3.88732C107 3.47824 107.133 3.1492 107.4 2.90019C107.667 2.6334 107.996 2.5 108.387 2.5C108.796 2.5 109.125 2.6334 109.374 2.90019C109.641 3.1492 109.775 3.47824 109.775 3.88732V21.9492C109.775 22.3405 109.641 22.6696 109.374 22.9364C109.125 23.2031 108.796 23.3365 108.387 23.3365C107.996 23.3365 107.667 23.2031 107.4 22.9364C107.133 22.6696 107 22.3405 107 21.9492V3.88732Z" fill="#FFFFFF"/><path d="M93.1347 8.6095C94.362 8.6095 95.4647 8.87629 96.4429 9.40988C97.4212 9.94346 98.186 10.7261 98.7374 11.7577C99.2887 12.7715 99.5644 13.9987 99.5644 15.4394V22.0025C99.5644 22.3938 99.431 22.7229 99.1642 22.9896C98.9152 23.2387 98.5951 23.3632 98.2038 23.3632C97.8125 23.3632 97.4834 23.2387 97.2166 22.9896C96.9676 22.7229 96.8431 22.3938 96.8431 22.0025V15.4394C96.8431 13.9987 96.4518 12.9138 95.6692 12.1845C94.9044 11.4375 93.8817 11.064 92.6011 11.064C91.8541 11.064 91.1693 11.2152 90.5468 11.5175C89.9421 11.8199 89.4618 12.229 89.1061 12.7448C88.7682 13.2606 88.5992 13.8386 88.5992 14.4789V22.0025C88.5992 22.3938 88.4747 22.7229 88.2257 22.9896C87.9767 23.2387 87.6477 23.3632 87.2386 23.3632C86.8473 23.3632 86.5182 23.2387 86.2514 22.9896C86.0024 22.7229 85.8779 22.3938 85.8779 22.0025V10.1035C85.8779 9.69446 86.0024 9.36541 86.2514 9.1164C86.5182 8.8674 86.8473 8.74289 87.2386 8.74289C87.6477 8.74289 87.9767 8.8674 88.2257 9.1164C88.4747 9.36541 88.5992 9.69446 88.5992 10.1035V10.397C89.1684 9.82785 89.8443 9.39209 90.6268 9.08972C91.4094 8.76957 92.2454 8.6095 93.1347 8.6095Z" fill="#FFFFFF"/><path d="M80.0534 8.58289C80.996 8.58289 81.7342 8.72518 82.2678 9.00976C82.8013 9.29433 83.0681 9.65006 83.0681 10.0769C83.0681 10.2014 83.0592 10.2904 83.0415 10.3437C82.8814 10.9129 82.5257 11.1975 81.9743 11.1975C81.8854 11.1975 81.752 11.1797 81.5741 11.1441C80.8627 11.0196 80.2846 10.9573 79.8399 10.9573C78.5593 10.9573 77.5277 11.2508 76.7451 11.8378C75.9625 12.4247 75.5713 13.2162 75.5713 14.2122V22.0026C75.5713 22.4295 75.4556 22.7585 75.2244 22.9897C75.011 23.2209 74.6819 23.3365 74.2373 23.3365C73.8104 23.3365 73.4814 23.2298 73.2502 23.0164C73.0189 22.7852 72.9033 22.4472 72.9033 22.0026V10.0769C72.9033 9.65006 73.0189 9.32101 73.2502 9.08979C73.4814 8.85857 73.8104 8.74296 74.2373 8.74296C75.1266 8.74296 75.5713 9.18762 75.5713 10.0769V10.5838C76.1048 9.96132 76.7629 9.4722 77.5455 9.11647C78.3281 8.76075 79.1641 8.58289 80.0534 8.58289Z" fill="#FFFFFF"/><path d="M61.5158 8.63623C62.8854 8.63623 64.1215 8.96527 65.2243 9.62336C66.3448 10.2637 67.2252 11.153 67.8655 12.2913C68.5236 13.4118 68.8526 14.6658 68.8526 16.0531V22.0026C68.8526 22.3939 68.7193 22.7229 68.4525 22.9897C68.2035 23.2387 67.8833 23.3632 67.492 23.3632C67.1007 23.3632 66.7717 23.2387 66.5049 22.9897C66.2559 22.7229 66.1314 22.3939 66.1314 22.0026V21.0154C65.5088 21.7802 64.7529 22.3761 63.8636 22.8029C62.9743 23.2298 62.0139 23.4432 60.9823 23.4432C59.7016 23.4432 58.5366 23.1231 57.4873 22.4828C56.4557 21.8425 55.6375 20.9621 55.0328 19.8415C54.4458 18.7032 54.1523 17.4404 54.1523 16.0531C54.1523 14.6658 54.4725 13.4118 55.1128 12.2913C55.7531 11.153 56.6335 10.2637 57.7541 9.62336C58.8924 8.96527 60.1463 8.63623 61.5158 8.63623ZM61.5158 21.0421C62.4051 21.0421 63.2055 20.8287 63.917 20.4018C64.6462 19.9572 65.2154 19.3613 65.6245 18.6143C66.0335 17.8495 66.2381 16.9957 66.2381 16.0531C66.2381 15.1104 66.0335 14.2567 65.6245 13.4919C65.2154 12.7271 64.6462 12.1312 63.917 11.7044C63.2055 11.2597 62.4051 11.0374 61.5158 11.0374C60.6265 11.0374 59.8173 11.2597 59.088 11.7044C58.3766 12.1312 57.8074 12.7271 57.3805 13.4919C56.9715 14.2567 56.7669 15.1104 56.7669 16.0531C56.7669 16.9957 56.9715 17.8495 57.3805 18.6143C57.8074 19.3613 58.3766 19.9572 59.088 20.4018C59.8173 20.8287 60.6265 21.0421 61.5158 21.0421Z" fill="#FFFFFF"/><path d="M51.9501 15.813C51.9501 16.1509 51.8345 16.4355 51.6033 16.6667C51.372 16.8801 51.0786 16.9869 50.7228 16.9869H40.5847C40.7803 18.2319 41.3406 19.2368 42.2655 20.0016C43.2082 20.7664 44.3554 21.1488 45.7071 21.1488C46.2407 21.1488 46.7921 21.051 47.3612 20.8554C47.9482 20.6597 48.4284 20.4196 48.8019 20.135C49.0509 19.9394 49.3444 19.8415 49.6823 19.8415C50.0203 19.8415 50.2871 19.9305 50.4827 20.1083C50.8029 20.3751 50.9629 20.6775 50.9629 21.0154C50.9629 21.3356 50.8207 21.6024 50.5361 21.8158C49.9313 22.296 49.1754 22.6873 48.2683 22.9897C47.379 23.2921 46.5253 23.4432 45.7071 23.4432C44.2487 23.4432 42.9414 23.132 41.7853 22.5095C40.6292 21.8692 39.7221 20.9888 39.064 19.8682C38.4237 18.7477 38.1035 17.476 38.1035 16.0531C38.1035 14.6302 38.4059 13.3585 39.0106 12.2379C39.6331 11.0996 40.4869 10.2192 41.5718 9.59668C42.6746 8.95638 43.9196 8.63623 45.3069 8.63623C46.6765 8.63623 47.8593 8.9386 48.8553 9.54333C49.8513 10.1481 50.6161 10.9929 51.1497 12.0779C51.6833 13.1628 51.9501 14.4079 51.9501 15.813ZM45.3069 10.9307C44.0085 10.9307 42.9503 11.2864 42.1321 11.9978C41.3317 12.7093 40.8248 13.6608 40.6114 14.8525H49.4956C49.3355 13.6608 48.8909 12.7093 48.1616 11.9978C47.4324 11.2864 46.4808 10.9307 45.3069 10.9307Z" fill="#FFFFFF"/><path d="M34.4059 20.5619C34.7972 20.5619 35.1262 20.6953 35.393 20.9621C35.6598 21.2289 35.7932 21.5579 35.7932 21.9492C35.7932 22.3405 35.6598 22.6696 35.393 22.9364C35.1262 23.2031 34.7972 23.3365 34.4059 23.3365H23.3606C22.9693 23.3365 22.6403 23.2031 22.3735 22.9364C22.1245 22.6696 22 22.3405 22 21.9492V3.88732C22 3.49603 22.1334 3.16698 22.4002 2.90019C22.667 2.6334 22.9871 2.5 23.3606 2.5C23.7519 2.5 24.081 2.6334 24.3478 2.90019C24.6146 3.16698 24.748 3.49603 24.748 3.88732V20.5619H34.4059Z" fill="#FFFFFF"/></g><defs><clipPath id="clip0_header"><rect width="159" height="25" fill="white" transform="translate(0 0.5)"/></clipPath></defs></svg>
+            <div class="header-info">
+                <span class="header-badge">Quiz</span>
+                <span class="header-title" id="headerTitle">Lekcja 01: Przykładowy Quiz</span>
+            </div>
+            <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Pełny ekran">
+                <span id="fullscreenIcon">&#x26F6;</span>
+                <span id="fullscreenText">Pełny ekran</span>
+            </button>
+        </header>
+
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <div class="start-card">
+                <div class="start-icon">📝</div>
+                <h1 class="start-title" id="startTitle">Przykładowy Quiz</h1>
+                <p class="start-description" id="startDescription">Quiz demonstracyjny pokazujący możliwości szablonu</p>
+
+                <div class="start-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">❓</div>
+                        <span><strong id="questionCount">5</strong> pytań</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🎯</div>
+                        <span>Próg zaliczenia: <strong id="passingScoreDisplay">70</strong>%</span>
+                    </div>
+                </div>
+
+                <!-- Continue from saved progress -->
+                <div class="continue-section hidden" id="continueSection">
+                    <div class="continue-card">
+                        <div class="continue-title">💾 Znaleziono zapisany postęp</div>
+                        <div class="continue-info">
+                            <span>Email: <strong id="savedEmail">-</strong></span>
+                            <span>Postęp: <strong id="savedProgress">-</strong></span>
+                        </div>
+                        <div class="continue-buttons">
+                            <button class="btn btn-primary" onclick="continueQuiz()">Kontynuuj →</button>
+                            <button class="btn btn-outline" onclick="startFresh()">Zacznij od nowa</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="email-form" id="emailForm">
+                    <label class="email-label" for="userEmail">Podaj swój adres email, aby rozpocząć:</label>
+                    <input type="email" id="userEmail" class="email-input" placeholder="twoj@email.com" autocomplete="email">
+                    <div class="email-error" id="emailError">Proszę podać prawidłowy adres email</div>
+                    <button class="btn btn-primary start-btn" onclick="startQuiz()">Rozpocznij quiz →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-screen hidden" id="quizScreen">
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span class="progress-counter">Pytanie <strong id="currentNum">1</strong> z <strong id="totalNum">5</strong></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <span class="question-number" id="questionNumber">Pytanie 1</span>
+                <p class="question-text" id="questionText"></p>
+                <pre class="question-code" id="questionCode" style="display: none;"><code id="codeContent"></code></pre>
+                <div class="options-list" id="optionsContainer"></div>
+
+                <div class="navigation-buttons">
+                    <div class="nav-left">
+                        <button class="btn btn-outline" id="prevBtn" onclick="previousQuestion()">&#8592; Poprzednie</button>
+                    </div>
+                    <div class="nav-right">
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Następne &#8594;</button>
+                        <button class="btn btn-primary hidden" id="finishBtn" onclick="finishQuiz()">Zakończ quiz &#10003;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-header">
+                <span class="results-badge">Wynik testu</span>
+                <div class="results-score" id="scoreValue">0%</div>
+                <div class="results-label">Twój wynik</div>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="correctCount">0</div>
+                        <div class="stat-label">Poprawnych</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="incorrectCount">0</div>
+                        <div class="stat-label">Błędnych</div>
+                    </div>
+                </div>
+                <div class="pass-status" id="passStatus"></div>
+            </div>
+
+            <div class="topic-results" id="topicResults">
+                <h3 class="topic-results-title">Wyniki według tematów</h3>
+                <div id="topicScoresContainer"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="restartBtn" onclick="restartQuiz()">&#8634; Rozpocznij ponownie</button>
+                <button class="btn btn-outline" id="reviewBtn" onclick="showReview()">&#128270; Przejrzyj odpowiedzi</button>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div class="results-screen" id="reviewScreen">
+            <div class="review-section">
+                <h2 class="review-title">Przegląd odpowiedzi</h2>
+                <div class="review-list" id="reviewContainer"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="restartQuiz()">&#8634; Rozpocznij ponownie</button>
+                <button class="btn btn-outline" onclick="backToResults()">&#8592; Powrót do wyników</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="document-footer">
+            <div class="footer-logo">
+                <svg width="100" height="17" viewBox="0 0 159 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_footer)"><path d="M149.406 23.7717C149.096 23.7717 148.681 23.6701 148.474 23.3652C147.956 22.8571 147.956 22.0441 148.474 21.5359L155.93 14.2188L148.474 6.90179C147.956 6.39366 147.956 5.58063 148.474 5.0725C148.992 4.56437 149.82 4.56437 150.338 5.0725L158.726 13.3042C158.933 13.5075 159.14 13.914 159.14 14.2188C159.14 14.5237 159.037 14.9302 158.726 15.1335L150.338 23.3652C150.131 23.5684 149.717 23.7717 149.406 23.7717Z" fill="#FFDA17"/><path d="M12.1147 23.7717C11.804 23.7717 11.3898 23.6701 11.1827 23.3652L2.79506 15.1335C2.58796 14.9302 2.38086 14.5237 2.38086 14.2188C2.38086 13.914 2.4844 13.5075 2.79506 13.3042L11.1827 5.0725C11.7005 4.56437 12.5289 4.56437 13.0467 5.0725C13.5644 5.58063 13.5644 6.39366 13.0467 6.90179L5.59095 14.2188L13.0467 21.5359C13.5644 22.0441 13.5644 22.8571 13.0467 23.3652C12.8396 23.5684 12.4254 23.7717 12.1147 23.7717Z" fill="#FFDA17"/><path d="M131.284 23.7713C130.973 23.7713 130.766 23.6697 130.559 23.568C129.938 23.1615 129.834 22.3485 130.249 21.7388L142.053 5.27536C142.468 4.6656 143.296 4.56395 143.917 4.97046C144.539 5.37696 144.642 6.18999 144.228 6.79975L132.423 23.2631C132.112 23.568 131.698 23.7713 131.284 23.7713Z" fill="#FFDA17"/><path d="M128.388 2.5C128.762 2.5 129.064 2.6245 129.295 2.87351C129.544 3.10473 129.669 3.4071 129.669 3.78061C129.669 4.15412 129.544 4.46538 129.295 4.71438C129.064 4.9456 128.762 5.06121 128.388 5.06121H122.652V21.9492C122.652 22.3405 122.519 22.6696 122.252 22.9364C121.985 23.2031 121.656 23.3365 121.265 23.3365C120.873 23.3365 120.544 23.2031 120.278 22.9364C120.011 22.6696 119.877 22.3405 119.877 21.9492V5.06121H114.115C113.741 5.06121 113.43 4.9456 113.181 4.71438C112.95 4.46538 112.834 4.15412 112.834 3.78061C112.834 3.4071 112.95 3.10473 113.181 2.87351C113.43 2.6245 113.741 2.5 114.115 2.5H128.388Z" fill="#FFFFFF"/><path d="M107 3.88732C107 3.47824 107.133 3.1492 107.4 2.90019C107.667 2.6334 107.996 2.5 108.387 2.5C108.796 2.5 109.125 2.6334 109.374 2.90019C109.641 3.1492 109.775 3.47824 109.775 3.88732V21.9492C109.775 22.3405 109.641 22.6696 109.374 22.9364C109.125 23.2031 108.796 23.3365 108.387 23.3365C107.996 23.3365 107.667 23.2031 107.4 22.9364C107.133 22.6696 107 22.3405 107 21.9492V3.88732Z" fill="#FFFFFF"/><path d="M93.1347 8.6095C94.362 8.6095 95.4647 8.87629 96.4429 9.40988C97.4212 9.94346 98.186 10.7261 98.7374 11.7577C99.2887 12.7715 99.5644 13.9987 99.5644 15.4394V22.0025C99.5644 22.3938 99.431 22.7229 99.1642 22.9896C98.9152 23.2387 98.5951 23.3632 98.2038 23.3632C97.8125 23.3632 97.4834 23.2387 97.2166 22.9896C96.9676 22.7229 96.8431 22.3938 96.8431 22.0025V15.4394C96.8431 13.9987 96.4518 12.9138 95.6692 12.1845C94.9044 11.4375 93.8817 11.064 92.6011 11.064C91.8541 11.064 91.1693 11.2152 90.5468 11.5175C89.9421 11.8199 89.4618 12.229 89.1061 12.7448C88.7682 13.2606 88.5992 13.8386 88.5992 14.4789V22.0025C88.5992 22.3938 88.4747 22.7229 88.2257 22.9896C87.9767 23.2387 87.6477 23.3632 87.2386 23.3632C86.8473 23.3632 86.5182 23.2387 86.2514 22.9896C86.0024 22.7229 85.8779 22.3938 85.8779 22.0025V10.1035C85.8779 9.69446 86.0024 9.36541 86.2514 9.1164C86.5182 8.8674 86.8473 8.74289 87.2386 8.74289C87.6477 8.74289 87.9767 8.8674 88.2257 9.1164C88.4747 9.36541 88.5992 9.69446 88.5992 10.1035V10.397C89.1684 9.82785 89.8443 9.39209 90.6268 9.08972C91.4094 8.76957 92.2454 8.6095 93.1347 8.6095Z" fill="#FFFFFF"/><path d="M80.0534 8.58289C80.996 8.58289 81.7342 8.72518 82.2678 9.00976C82.8013 9.29433 83.0681 9.65006 83.0681 10.0769C83.0681 10.2014 83.0592 10.2904 83.0415 10.3437C82.8814 10.9129 82.5257 11.1975 81.9743 11.1975C81.8854 11.1975 81.752 11.1797 81.5741 11.1441C80.8627 11.0196 80.2846 10.9573 79.8399 10.9573C78.5593 10.9573 77.5277 11.2508 76.7451 11.8378C75.9625 12.4247 75.5713 13.2162 75.5713 14.2122V22.0026C75.5713 22.4295 75.4556 22.7585 75.2244 22.9897C75.011 23.2209 74.6819 23.3365 74.2373 23.3365C73.8104 23.3365 73.4814 23.2298 73.2502 23.0164C73.0189 22.7852 72.9033 22.4472 72.9033 22.0026V10.0769C72.9033 9.65006 73.0189 9.32101 73.2502 9.08979C73.4814 8.85857 73.8104 8.74296 74.2373 8.74296C75.1266 8.74296 75.5713 9.18762 75.5713 10.0769V10.5838C76.1048 9.96132 76.7629 9.4722 77.5455 9.11647C78.3281 8.76075 79.1641 8.58289 80.0534 8.58289Z" fill="#FFFFFF"/><path d="M61.5158 8.63623C62.8854 8.63623 64.1215 8.96527 65.2243 9.62336C66.3448 10.2637 67.2252 11.153 67.8655 12.2913C68.5236 13.4118 68.8526 14.6658 68.8526 16.0531V22.0026C68.8526 22.3939 68.7193 22.7229 68.4525 22.9897C68.2035 23.2387 67.8833 23.3632 67.492 23.3632C67.1007 23.3632 66.7717 23.2387 66.5049 22.9897C66.2559 22.7229 66.1314 22.3939 66.1314 22.0026V21.0154C65.5088 21.7802 64.7529 22.3761 63.8636 22.8029C62.9743 23.2298 62.0139 23.4432 60.9823 23.4432C59.7016 23.4432 58.5366 23.1231 57.4873 22.4828C56.4557 21.8425 55.6375 20.9621 55.0328 19.8415C54.4458 18.7032 54.1523 17.4404 54.1523 16.0531C54.1523 14.6658 54.4725 13.4118 55.1128 12.2913C55.7531 11.153 56.6335 10.2637 57.7541 9.62336C58.8924 8.96527 60.1463 8.63623 61.5158 8.63623ZM61.5158 21.0421C62.4051 21.0421 63.2055 20.8287 63.917 20.4018C64.6462 19.9572 65.2154 19.3613 65.6245 18.6143C66.0335 17.8495 66.2381 16.9957 66.2381 16.0531C66.2381 15.1104 66.0335 14.2567 65.6245 13.4919C65.2154 12.7271 64.6462 12.1312 63.917 11.7044C63.2055 11.2597 62.4051 11.0374 61.5158 11.0374C60.6265 11.0374 59.8173 11.2597 59.088 11.7044C58.3766 12.1312 57.8074 12.7271 57.3805 13.4919C56.9715 14.2567 56.7669 15.1104 56.7669 16.0531C56.7669 16.9957 56.9715 17.8495 57.3805 18.6143C57.8074 19.3613 58.3766 19.9572 59.088 20.4018C59.8173 20.8287 60.6265 21.0421 61.5158 21.0421Z" fill="#FFFFFF"/><path d="M51.9501 15.813C51.9501 16.1509 51.8345 16.4355 51.6033 16.6667C51.372 16.8801 51.0786 16.9869 50.7228 16.9869H40.5847C40.7803 18.2319 41.3406 19.2368 42.2655 20.0016C43.2082 20.7664 44.3554 21.1488 45.7071 21.1488C46.2407 21.1488 46.7921 21.051 47.3612 20.8554C47.9482 20.6597 48.4284 20.4196 48.8019 20.135C49.0509 19.9394 49.3444 19.8415 49.6823 19.8415C50.0203 19.8415 50.2871 19.9305 50.4827 20.1083C50.8029 20.3751 50.9629 20.6775 50.9629 21.0154C50.9629 21.3356 50.8207 21.6024 50.5361 21.8158C49.9313 22.296 49.1754 22.6873 48.2683 22.9897C47.379 23.2921 46.5253 23.4432 45.7071 23.4432C44.2487 23.4432 42.9414 23.132 41.7853 22.5095C40.6292 21.8692 39.7221 20.9888 39.064 19.8682C38.4237 18.7477 38.1035 17.476 38.1035 16.0531C38.1035 14.6302 38.4059 13.3585 39.0106 12.2379C39.6331 11.0996 40.4869 10.2192 41.5718 9.59668C42.6746 8.95638 43.9196 8.63623 45.3069 8.63623C46.6765 8.63623 47.8593 8.9386 48.8553 9.54333C49.8513 10.1481 50.6161 10.9929 51.1497 12.0779C51.6833 13.1628 51.9501 14.4079 51.9501 15.813ZM45.3069 10.9307C44.0085 10.9307 42.9503 11.2864 42.1321 11.9978C41.3317 12.7093 40.8248 13.6608 40.6114 14.8525H49.4956C49.3355 13.6608 48.8909 12.7093 48.1616 11.9978C47.4324 11.2864 46.4808 10.9307 45.3069 10.9307Z" fill="#FFFFFF"/><path d="M34.4059 20.5619C34.7972 20.5619 35.1262 20.6953 35.393 20.9621C35.6598 21.2289 35.7932 21.5579 35.7932 21.9492C35.7932 22.3405 35.6598 22.6696 35.393 22.9364C35.1262 23.2031 34.7972 23.3365 34.4059 23.3365H23.3606C22.9693 23.3365 22.6403 23.2031 22.3735 22.9364C22.1245 22.6696 22 22.3405 22 21.9492V3.88732C22 3.49603 22.1334 3.16698 22.4002 2.90019C22.667 2.6334 22.9871 2.5 23.3606 2.5C23.7519 2.5 24.081 2.6334 24.3478 2.90019C24.6146 3.16698 24.748 3.49603 24.748 3.88732V20.5619H34.4059Z" fill="#FFFFFF"/></g><defs><clipPath id="clip0_footer"><rect width="159" height="25" fill="white" transform="translate(0 0.5)"/></clipPath></defs></svg>
+                <span style="margin-left: 5px; font-size: 0.8rem; color: var(--color-gray);">sp. z o.o.</span>
+            </div>
+            <div class="footer-contacts">
+                <div class="footer-contact"><span>&#128222;</span><a href="tel:+48573580990">+48 573-580-990</a></div>
+                <div class="footer-contact"><span>&#127760;</span><a href="https://learnit.com.pl">learnit.com.pl</a></div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+
+// book-questions.js
+// Auto-generated by book-questions-generator skill
+// Last updated: 2026-02-04
+
+const bookQuestions = [
+    // === Lesson 01: DevOps - Rewolucja w tworzeniu oprogramowania ===
+    {
+        id: 1,
+        question: "Co oznacza skrót DevOps?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Development Operations", explanation: "Poprawnie! DevOps to połączenie słów Development (programowanie) i Operations (operacje/administracja)." },
+            { key: "B", text: "Device Operations", explanation: "Niepoprawnie. DevOps nie odnosi się do urządzeń (devices)." },
+            { key: "C", text: "Developer Optimization", explanation: "Niepoprawnie. Choć optymalizacja jest częścią DevOps, nazwa pochodzi od Development + Operations." },
+            { key: "D", text: "Deployment Options", explanation: "Niepoprawnie. DevOps to nie opcje wdrożenia, lecz kultura współpracy między zespołami." }
+        ],
+        correctAnswer: "A",
+        topic: "Wprowadzenie do DevOps"
+    },
+    {
+        id: 2,
+        question: "Jaki jest główny cel kultury DevOps w organizacji?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Zastąpienie programistów przez administratorów", explanation: "Niepoprawnie. DevOps nie zastępuje żadnej roli, lecz integruje zespoły." },
+            { key: "B", text: "Skrócenie cyklu dostarczania oprogramowania poprzez współpracę zespołów", explanation: "Poprawnie! DevOps skupia się na współpracy Dev i Ops, automatyzacji i szybszym dostarczaniu wartości." },
+            { key: "C", text: "Eliminacja testowania oprogramowania", explanation: "Niepoprawnie. DevOps promuje ciągłe testowanie (CI/CD), nie jego eliminację." },
+            { key: "D", text: "Używanie wyłącznie open-source narzędzi", explanation: "Niepoprawnie. DevOps to metodologia, nie wymóg konkretnych narzędzi." }
+        ],
+        correctAnswer: "B",
+        topic: "Wprowadzenie do DevOps"
+    },
+    {
+        id: 3,
+        question: "Firma ma MTTR (Mean Time To Recovery) wynoszący 4 godziny. Co to oznacza w praktyce?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "System działa średnio 4 godziny przed awarią", explanation: "Niepoprawnie. To opisuje MTBF (Mean Time Between Failures), nie MTTR." },
+            { key: "B", text: "Wdrożenie nowej wersji trwa średnio 4 godziny", explanation: "Niepoprawnie. Czas wdrożenia to osobna metryka (Lead Time), nie MTTR." },
+            { key: "C", text: "Średni czas od wykrycia awarii do przywrócenia usługi wynosi 4 godziny", explanation: "Poprawnie! MTTR mierzy jak szybko zespół przywraca system po awarii." },
+            { key: "D", text: "Testy automatyczne trwają średnio 4 godziny", explanation: "Niepoprawnie. Czas testów nie jest częścią metryki MTTR." }
+        ],
+        correctAnswer: "C",
+        topic: "Wprowadzenie do DevOps"
+    },
+
+    // === Lesson 02: Systemy operacyjne - Fundament nowoczesnego programowania ===
+    {
+        id: 4,
+        question: "W którym katalogu Linux przechowuje pliki konfiguracyjne systemowe?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "/bin/", explanation: "Niepoprawnie. /bin/ zawiera podstawowe pliki wykonywalne (binaries)." },
+            { key: "B", text: "/etc/", explanation: "Poprawnie! /etc/ (Editable Text Configuration) przechowuje pliki konfiguracyjne systemu." },
+            { key: "C", text: "/var/", explanation: "Niepoprawnie. /var/ zawiera zmienne dane jak logi, cache, spools." },
+            { key: "D", text: "/usr/", explanation: "Niepoprawnie. /usr/ zawiera programy i dane użytkownika (user)." }
+        ],
+        correctAnswer: "B",
+        topic: "Linux - podstawy"
+    },
+    {
+        id: 5,
+        question: "Jaka jest różnica między jądrem Linux a dystrybucją Linux?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Jądro to interfejs graficzny, dystrybucja to terminal", explanation: "Niepoprawnie. Jądro nie jest interfejsem graficznym." },
+            { key: "B", text: "Jądro zarządza sprzętem, dystrybucja to kompletny system z jądrem i narzędziami", explanation: "Poprawnie! Jądro (kernel) to rdzeń systemu, dystrybucja dodaje pakiety, menedżer pakietów i konfigurację." },
+            { key: "C", text: "Jądro i dystrybucja to synonimy tego samego pojęcia", explanation: "Niepoprawnie. Jądro to tylko jeden komponent dystrybucji." },
+            { key: "D", text: "Dystrybucja działa tylko na serwerach, jądro na desktopach", explanation: "Niepoprawnie. Obie koncepcje działają na wszystkich typach urządzeń." }
+        ],
+        correctAnswer: "B",
+        topic: "Linux - podstawy"
+    },
+    {
+        id: 6,
+        question: "Plik ma uprawnienia 755. Co to oznacza?",
+        code: "ls -l script.sh\n-rwxr-xr-x 1 user group 1024 Jan 1 12:00 script.sh",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Właściciel: odczyt/zapis/wykonanie, Grupa i Inni: odczyt/wykonanie", explanation: "Poprawnie! 7=rwx (właściciel), 5=r-x (grupa), 5=r-x (inni). Właściciel ma pełne prawa, reszta może czytać i uruchamiać." },
+            { key: "B", text: "Wszyscy użytkownicy mają pełne uprawnienia (rwx)", explanation: "Niepoprawnie. Pełne uprawnienia dla wszystkich to 777, nie 755." },
+            { key: "C", text: "Plik jest tylko do odczytu dla wszystkich", explanation: "Niepoprawnie. 755 zawiera uprawnienia do wykonania (x) i zapisu dla właściciela (w)." },
+            { key: "D", text: "Tylko właściciel może odczytać plik", explanation: "Niepoprawnie. Wartość 5 dla grupy i innych oznacza prawo odczytu (r) i wykonania (x)." }
+        ],
+        correctAnswer: "A",
+        topic: "Linux - podstawy"
+    },
+
+    // === Lesson 03: Wprowadzenie do pracy z wierszem poleceń – potęga Basha ===
+    {
+        id: 7,
+        question: "Co to jest powłoka (shell) w systemie Linux?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Graficzny interfejs użytkownika", explanation: "Niepoprawnie. Shell to interpreter wiersza poleceń, nie GUI." },
+            { key: "B", text: "Program tłumaczący polecenia użytkownika na instrukcje dla jądra systemu", explanation: "Poprawnie! Shell (np. Bash) interpretuje polecenia i komunikuje się z jądrem systemu." },
+            { key: "C", text: "Rodzaj systemu plików", explanation: "Niepoprawnie. Shell to interpreter poleceń, nie system plików." },
+            { key: "D", text: "Menedżer pakietów", explanation: "Niepoprawnie. Menedżer pakietów (apt, dnf) to oddzielne narzędzie." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash i Shell"
+    },
+    {
+        id: 8,
+        question: "Jaka jest różnica między zmienną lokalną a zmienną środowiskową w Bash?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Zmienna lokalna jest dostępna tylko w bieżącej sesji, środowiskowa jest dziedziczona przez procesy potomne", explanation: "Poprawnie! Użycie 'export' sprawia, że zmienna staje się środowiskową i jest dostępna dla procesów uruchamianych z tej powłoki." },
+            { key: "B", text: "Zmienna środowiskowa jest dostępna tylko w bieżącej sesji", explanation: "Niepoprawnie. To opisuje zmienną lokalną, nie środowiskową." },
+            { key: "C", text: "Zmienne lokalne mogą przechowywać tylko liczby", explanation: "Niepoprawnie. Obie mogą przechowywać dowolne wartości tekstowe." },
+            { key: "D", text: "Nie ma różnicy, to synonimy", explanation: "Niepoprawnie. Zasięg i dziedziczenie to kluczowe różnice." }
+        ],
+        correctAnswer: "A",
+        topic: "Bash i Shell"
+    },
+    {
+        id: 9,
+        question: "Co wyświetli poniższe polecenie?",
+        code: "echo \"Hello World\" | wc -w",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Hello World", explanation: "Niepoprawnie. wc -w zwraca liczbę słów, nie tekst wejściowy." },
+            { key: "B", text: "2", explanation: "Poprawnie! wc -w liczy słowa. 'Hello World' to 2 słowa." },
+            { key: "C", text: "11", explanation: "Niepoprawnie. 11 to liczba znaków (wc -c bez newline), nie słów." },
+            { key: "D", text: "1", explanation: "Niepoprawnie. 'Hello World' to 2 słowa, nie 1." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash i Shell"
+    },
+
+    // === Lesson 04: Administracja systemem - Procesy i Usługi ===
+    {
+        id: 10,
+        question: "Co to jest PID w kontekście procesów Linux?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Process Identifier - unikalny numer identyfikujący proces", explanation: "Poprawnie! Każdy uruchomiony proces otrzymuje unikalny PID od jądra systemu." },
+            { key: "B", text: "Private Internet Domain - adres sieciowy procesu", explanation: "Niepoprawnie. PID nie ma związku z siecią." },
+            { key: "C", text: "Program Installation Directory - ścieżka instalacji", explanation: "Niepoprawnie. PID to identyfikator procesu, nie lokalizacja." },
+            { key: "D", text: "Peripheral Interface Device - sterownik urządzenia", explanation: "Niepoprawnie. PID identyfikuje procesy, nie urządzenia." }
+        ],
+        correctAnswer: "A",
+        topic: "Procesy i usługi"
+    },
+    {
+        id: 11,
+        question: "Jaka jest główna różnica między systemd a init.d (SysVinit)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "init.d jest nowszy i szybszy niż systemd", explanation: "Niepoprawnie. To systemd jest nowszym systemem, który zastąpił init.d." },
+            { key: "B", text: "systemd uruchamia usługi równolegle, init.d sekwencyjnie", explanation: "Poprawnie! systemd paralelizuje uruchamianie usług, co przyspiesza boot. init.d wykonuje skrypty jeden po drugim." },
+            { key: "C", text: "Oba systemy działają identycznie, różnią się tylko nazwą", explanation: "Niepoprawnie. Architektura i możliwości obu systemów znacząco się różnią." },
+            { key: "D", text: "systemd działa tylko na serwerach, init.d na desktopach", explanation: "Niepoprawnie. Oba mogą działać na dowolnym typie systemu Linux." }
+        ],
+        correctAnswer: "B",
+        topic: "Procesy i usługi"
+    },
+    {
+        id: 12,
+        question: "Administrator chce, aby usługa nginx uruchamiała się automatycznie po restarcie serwera. Które polecenie powinien użyć?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "systemctl start nginx", explanation: "Niepoprawnie. 'start' uruchamia usługę teraz, ale nie włącza autostartu." },
+            { key: "B", text: "systemctl enable nginx", explanation: "Poprawnie! 'enable' tworzy symlink w target'cie boot, zapewniając autostart przy starcie systemu." },
+            { key: "C", text: "systemctl restart nginx", explanation: "Niepoprawnie. 'restart' restartuje działającą usługę, nie konfiguruje autostartu." },
+            { key: "D", text: "systemctl status nginx", explanation: "Niepoprawnie. 'status' tylko wyświetla stan usługi, niczego nie zmienia." }
+        ],
+        correctAnswer: "B",
+        topic: "Procesy i usługi"
+    },
+
+    // === Lesson 05: Podstawy sieci - Adresy IP i Porty ===
+    {
+        id: 13,
+        question: "Co to jest port w kontekście sieci komputerowych?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Fizyczne złącze sieciowe (np. RJ-45)", explanation: "Niepoprawnie. To jest port fizyczny, pytanie dotyczy portów logicznych/sieciowych." },
+            { key: "B", text: "Logiczny punkt końcowy komunikacji identyfikujący usługę na hoście", explanation: "Poprawnie! Port (1-65535) identyfikuje konkretną usługę/aplikację na danym adresie IP." },
+            { key: "C", text: "Synonim adresu IP", explanation: "Niepoprawnie. Adres IP identyfikuje host, port identyfikuje usługę na tym hoście." },
+            { key: "D", text: "Protokół sieciowy", explanation: "Niepoprawnie. Protokół (TCP/UDP) to sposób komunikacji, port to jej punkt końcowy." }
+        ],
+        correctAnswer: "B",
+        topic: "Podstawy sieci"
+    },
+    {
+        id: 14,
+        question: "Dlaczego adres 127.0.0.1 nazywany jest localhost?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Jest to domyślna brama sieciowa", explanation: "Niepoprawnie. Brama domyślna to adres routera, nie localhost." },
+            { key: "B", text: "Jest to adres pętli zwrotnej (loopback) wskazujący na własny komputer", explanation: "Poprawnie! 127.0.0.1 to specjalny adres loopback - pakiety wysłane na ten adres wracają do tego samego hosta." },
+            { key: "C", text: "Jest to pierwszy dostępny adres w sieci lokalnej", explanation: "Niepoprawnie. Pierwszy adres w sieci to zazwyczaj adres sieci lub bramy." },
+            { key: "D", text: "Jest to publiczny adres DNS", explanation: "Niepoprawnie. 127.0.0.1 to adres prywatny, nie publiczny." }
+        ],
+        correctAnswer: "B",
+        topic: "Podstawy sieci"
+    },
+    {
+        id: 15,
+        question: "Deweloper uruchamia aplikację na porcie 3000 na swoim komputerze. Chce udostępnić ją testerowi przez internet. Które narzędzie najlepiej rozwiąże ten problem?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "curl - do testowania połączeń HTTP", explanation: "Niepoprawnie. curl służy do wysyłania żądań HTTP, nie do udostępniania lokalnych usług." },
+            { key: "B", text: "ping - do sprawdzania dostępności hosta", explanation: "Niepoprawnie. ping sprawdza połączenie ICMP, nie udostępnia usług." },
+            { key: "C", text: "ngrok - do tworzenia tunelu z publicznym URL", explanation: "Poprawnie! ngrok tworzy bezpieczny tunel i przydziela publiczny URL (np. https://xyz.ngrok.io) do lokalnej usługi." },
+            { key: "D", text: "netstat - do wyświetlania połączeń sieciowych", explanation: "Niepoprawnie. netstat pokazuje statystyki sieci, nie tworzy tuneli." }
+        ],
+        correctAnswer: "C",
+        topic: "Podstawy sieci"
+    },
+
+    // === Lesson 06: DNS i Domeny ===
+    {
+        id: 16,
+        question: "Co to jest DNS (Domain Name System)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Protokół do szyfrowania ruchu sieciowego", explanation: "Niepoprawnie. Szyfrowanie to SSL/TLS, nie DNS." },
+            { key: "B", text: "System tłumaczący nazwy domenowe na adresy IP", explanation: "Poprawnie! DNS działa jak książka telefoniczna internetu - zamienia np. google.com na 142.250.186.78." },
+            { key: "C", text: "Narzędzie do monitorowania sieci", explanation: "Niepoprawnie. DNS nie służy do monitorowania." },
+            { key: "D", text: "Typ bazy danych", explanation: "Niepoprawnie. DNS to system nazw, nie typ bazy danych." }
+        ],
+        correctAnswer: "B",
+        topic: "DNS i domeny"
+    },
+    {
+        id: 17,
+        question: "Co oznacza rekord DNS typu A?",
+        code: "mysite.com.     IN  A   203.0.113.10",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Mapuje nazwę domenową bezpośrednio na adres IPv4", explanation: "Poprawnie! Rekord A (Address) wiąże nazwę domeny z konkretnym adresem IP." },
+            { key: "B", text: "Tworzy alias dla innej domeny", explanation: "Niepoprawnie. To opisuje rekord CNAME, nie A." },
+            { key: "C", text: "Określa serwer pocztowy dla domeny", explanation: "Niepoprawnie. To opisuje rekord MX, nie A." },
+            { key: "D", text: "Przechowuje dowolny tekst", explanation: "Niepoprawnie. To opisuje rekord TXT, nie A." }
+        ],
+        correctAnswer: "A",
+        topic: "DNS i domeny"
+    },
+    {
+        id: 18,
+        question: "Programista widzi w przeglądarce błąd: 'Access blocked by CORS policy'. Co jest przyczyną?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Brak połączenia z internetem", explanation: "Niepoprawnie. Błąd CORS nie oznacza braku połączenia." },
+            { key: "B", text: "Frontend próbuje wysłać żądanie do API na innej domenie bez odpowiednich nagłówków", explanation: "Poprawnie! CORS blokuje żądania cross-origin gdy serwer nie zwraca nagłówka Access-Control-Allow-Origin." },
+            { key: "C", text: "Certyfikat SSL wygasł", explanation: "Niepoprawnie. Problem z SSL daje inny błąd, nie CORS." },
+            { key: "D", text: "Serwer DNS nie odpowiada", explanation: "Niepoprawnie. Problem DNS daje błąd rozwiązywania nazwy, nie CORS." }
+        ],
+        correctAnswer: "B",
+        topic: "DNS i domeny"
+    },
+
+    // === Lesson 07: Wirtualizacja - od teorii do praktyki ===
+    {
+        id: 19,
+        question: "Co to jest hypervisor?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Program zarządzający maszynami wirtualnymi i przydzielający im zasoby sprzętowe", explanation: "Poprawnie! Hypervisor (np. VirtualBox, VMware, Hyper-V) tworzy warstwę między VM a sprzętem fizycznym." },
+            { key: "B", text: "System operacyjny dla serwerów", explanation: "Niepoprawnie. Hypervisor to warstwa wirtualizacji, nie system operacyjny." },
+            { key: "C", text: "Narzędzie do monitorowania wydajności CPU", explanation: "Niepoprawnie. Hypervisor zarządza VM, nie monitoruje wydajności." },
+            { key: "D", text: "Protokół sieciowy do zdalnego dostępu", explanation: "Niepoprawnie. Hypervisor nie jest protokołem sieciowym." }
+        ],
+        correctAnswer: "A",
+        topic: "Wirtualizacja"
+    },
+    {
+        id: 20,
+        question: "Jaka jest kluczowa różnica między maszyną wirtualną (VM) a kontenerem?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "VM wymaga własnego systemu operacyjnego, kontener współdzieli jądro z hostem", explanation: "Poprawnie! VM ma pełną izolację z własnym OS, kontener jest lżejszy bo używa jądra systemu hosta." },
+            { key: "B", text: "Kontenery są wolniejsze niż maszyny wirtualne", explanation: "Niepoprawnie. Kontenery są szybsze ze względu na brak potrzeby emulacji całego OS." },
+            { key: "C", text: "Maszyny wirtualne działają tylko na Linux", explanation: "Niepoprawnie. VM działają na Windows, macOS, Linux i innych systemach." },
+            { key: "D", text: "Kontenery zapewniają pełną izolację sprzętową", explanation: "Niepoprawnie. To VM zapewniają izolację na poziomie sprzętu, kontenery izolują na poziomie procesów." }
+        ],
+        correctAnswer: "A",
+        topic: "Wirtualizacja"
+    },
+    {
+        id: 21,
+        question: "Co zrobi poniższe polecenie PowerShell?",
+        code: "New-VM -Name \"UbuntuDev\" -MemoryStartupBytes 4GB -Generation 2 `\n    -NewVHDPath \"C:\\VMs\\UbuntuDev.vhdx\" -NewVHDSizeBytes 20GB `\n    -SwitchName \"Default Switch\"",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Usunie maszynę wirtualną UbuntuDev", explanation: "Niepoprawnie. New-VM tworzy nową VM, do usuwania służy Remove-VM." },
+            { key: "B", text: "Utworzy nową maszynę wirtualną Hyper-V z 4GB RAM i 20GB dyskiem", explanation: "Poprawnie! New-VM tworzy VM w Hyper-V z podanymi parametrami: pamięć, dysk VHD i przełącznik sieciowy." },
+            { key: "C", text: "Sklonuje istniejącą maszynę wirtualną", explanation: "Niepoprawnie. New-VM tworzy nową VM, nie klonuje istniejącej." },
+            { key: "D", text: "Zmieni ustawienia istniejącej maszyny wirtualnej", explanation: "Niepoprawnie. Do zmiany ustawień służy Set-VM, nie New-VM." }
+        ],
+        correctAnswer: "B",
+        topic: "Wirtualizacja"
+    },
+
+    // === Lesson 08: Narzędzia Uniksa - Część 1 ===
+    {
+        id: 22,
+        question: "W którym pliku Linux przechowuje zaszyfrowane hasła użytkowników?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "/etc/passwd", explanation: "Niepoprawnie. /etc/passwd zawiera informacje o użytkownikach, ale bez haseł (z powodów bezpieczeństwa)." },
+            { key: "B", text: "/etc/shadow", explanation: "Poprawnie! /etc/shadow przechowuje zaszyfrowane hasła i jest dostępny tylko dla roota." },
+            { key: "C", text: "/etc/group", explanation: "Niepoprawnie. /etc/group zawiera informacje o grupach, nie hasła." },
+            { key: "D", text: "/etc/sudoers", explanation: "Niepoprawnie. /etc/sudoers konfiguruje uprawnienia sudo, nie przechowuje haseł." }
+        ],
+        correctAnswer: "B",
+        topic: "Narzędzia Uniksa - część 1"
+    },
+    {
+        id: 23,
+        question: "Co oznacza flaga -a w poleceniu rsync?",
+        code: "rsync -av /source/ /destination/",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tryb archiwizacji zachowujący uprawnienia, czasy modyfikacji i rekursywność", explanation: "Poprawnie! -a (archive) to skrót dla -rlptgoD: rekursja, linki, uprawnienia, czasy, grupy, właściciel, devices." },
+            { key: "B", text: "Wyświetlanie wszystkich plików (all)", explanation: "Niepoprawnie. Do wyświetlania szczegółów służy -v (verbose), nie -a." },
+            { key: "C", text: "Automatyczne usuwanie plików w miejscu docelowym", explanation: "Niepoprawnie. Do usuwania służy --delete, nie -a." },
+            { key: "D", text: "Kompresja danych podczas transferu", explanation: "Niepoprawnie. Do kompresji służy -z, nie -a." }
+        ],
+        correctAnswer: "A",
+        topic: "Narzędzia Uniksa - część 1"
+    },
+    {
+        id: 24,
+        question: "Administrator otworzył plik w Vim i wpisał tekst. Teraz chce zapisać plik i wyjść. Jaka sekwencja klawiszy jest poprawna?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Ctrl+S, Ctrl+Q", explanation: "Niepoprawnie. To skróty typowe dla edytorów graficznych, nie dla Vim." },
+            { key: "B", text: "Esc, :wq, Enter", explanation: "Poprawnie! Esc wychodzi z trybu wstawiania, :wq zapisuje (write) i wychodzi (quit)." },
+            { key: "C", text: ":w, :exit", explanation: "Niepoprawnie. :exit nie istnieje w Vim, poprawnie to :q lub :wq." },
+            { key: "D", text: "F2, Enter", explanation: "Niepoprawnie. F2 nie ma domyślnego przypisania w Vim." }
+        ],
+        correctAnswer: "B",
+        topic: "Narzędzia Uniksa - część 1"
+    },
+
+    // === Lesson 09: Narzędzia Uniksa - Część 2 ===
+    {
+        id: 25,
+        question: "Co to jest LVM (Logical Volume Manager)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "System zarządzania dyskami umożliwiający elastyczne tworzenie i zmianę rozmiaru partycji", explanation: "Poprawnie! LVM wprowadza warstwę abstrakcji między dyskami fizycznymi a systemem plików, umożliwiając dynamiczne zarządzanie przestrzenią." },
+            { key: "B", text: "Program do monitorowania pamięci RAM", explanation: "Niepoprawnie. LVM zarządza dyskami, nie pamięcią RAM." },
+            { key: "C", text: "Typ systemu plików podobny do ext4", explanation: "Niepoprawnie. LVM to menedżer woluminów, nie system plików." },
+            { key: "D", text: "Narzędzie do tworzenia kopii zapasowych", explanation: "Niepoprawnie. LVM zarządza partycjami, choć wspiera snapshoty." }
+        ],
+        correctAnswer: "A",
+        topic: "Narzędzia Uniksa - część 2"
+    },
+    {
+        id: 26,
+        question: "Co zrobi polecenie tar -czvf backup.tar.gz /home/user/?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Rozpakuje archiwum backup.tar.gz do /home/user/", explanation: "Niepoprawnie. Do rozpakowywania służy -x (extract), tu jest -c (create)." },
+            { key: "B", text: "Utworzy skompresowane archiwum gzip z katalogu /home/user/", explanation: "Poprawnie! -c=create, -z=gzip compression, -v=verbose, -f=file name. Tworzy archiwum tar.gz." },
+            { key: "C", text: "Wyświetli zawartość archiwum backup.tar.gz", explanation: "Niepoprawnie. Do wyświetlania zawartości służy -t (list), nie -c." },
+            { key: "D", text: "Usunie katalog /home/user/ i utworzy puste archiwum", explanation: "Niepoprawnie. tar nie usuwa źródła, tylko kopiuje do archiwum." }
+        ],
+        correctAnswer: "B",
+        topic: "Narzędzia Uniksa - część 2"
+    },
+    {
+        id: 27,
+        question: "Administrator chce zwiększyć bezpieczeństwo serwera SSH. Które działanie jest najbardziej skuteczne?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Zmiana portu SSH z 22 na inny", explanation: "Niepoprawnie. Zmiana portu to security through obscurity - utrudnia, ale nie zabezpiecza." },
+            { key: "B", text: "Wyłączenie logowania hasłem i używanie tylko kluczy SSH", explanation: "Poprawnie! Klucze SSH są znacznie bezpieczniejsze niż hasła - odporne na ataki brute-force i nie można ich podsłuchać." },
+            { key: "C", text: "Zwiększenie długości hasła do 8 znaków", explanation: "Niepoprawnie. 8 znaków to minimum, ale klucze SSH są znacznie bezpieczniejsze." },
+            { key: "D", text: "Instalacja graficznego interfejsu", explanation: "Niepoprawnie. GUI nie zwiększa bezpieczeństwa SSH." }
+        ],
+        correctAnswer: "B",
+        topic: "Narzędzia Uniksa - część 2"
+    },
+
+    // === Lesson 10: Repozytoria ===
+    {
+        id: 28,
+        question: "Co robi polecenie git init?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tworzy nowe repozytorium Git w bieżącym katalogu", explanation: "Poprawnie! git init tworzy ukryty katalog .git, który przechowuje wszystkie dane o historii projektu." },
+            { key: "B", text: "Pobiera repozytorium ze zdalnego serwera", explanation: "Niepoprawnie. Do pobierania służy git clone, nie git init." },
+            { key: "C", text: "Usuwa wszystkie zmiany w repozytorium", explanation: "Niepoprawnie. git init nie usuwa zmian, tylko inicjalizuje repozytorium." },
+            { key: "D", text: "Wysyła zmiany na serwer", explanation: "Niepoprawnie. Do wysyłania służy git push, nie git init." }
+        ],
+        correctAnswer: "A",
+        topic: "Repozytoria i Git"
+    },
+    {
+        id: 29,
+        question: "Czym jest Git-flow i jakie są jego główne gałęzie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Model rozgałęzień z gałęziami main (produkcja) i develop (rozwój)", explanation: "Poprawnie! Git-flow to uporządkowany model z gałęziami main, develop, feature, release i hotfix." },
+            { key: "B", text: "Narzędzie do automatycznego łączenia gałęzi", explanation: "Niepoprawnie. Git-flow to model pracy, nie narzędzie automatyczne." },
+            { key: "C", text: "Alternatywna nazwa dla polecenia git merge", explanation: "Niepoprawnie. Git-flow to strategia zarządzania gałęziami, nie polecenie." },
+            { key: "D", text: "System do hostowania repozytoriów Git", explanation: "Niepoprawnie. Hosting to GitHub/GitLab, Git-flow to model rozgałęzień." }
+        ],
+        correctAnswer: "A",
+        topic: "Repozytoria i Git"
+    },
+    {
+        id: 30,
+        question: "Jaka jest różnica między git merge a git rebase?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Nie ma różnicy, oba polecenia działają identycznie", explanation: "Niepoprawnie. merge i rebase różnią się sposobem integracji zmian." },
+            { key: "B", text: "merge tworzy commit scalający, rebase przepisuje historię przenosząc commity na nową bazę", explanation: "Poprawnie! merge zachowuje historię z commit'em merge, rebase 'przenosi' commity tworząc liniową historię." },
+            { key: "C", text: "rebase jest bezpieczniejszy niż merge", explanation: "Niepoprawnie. rebase może być niebezpieczny na wspólnych gałęziach, bo przepisuje historię." },
+            { key: "D", text: "merge działa tylko lokalnie, rebase tylko zdalnie", explanation: "Niepoprawnie. Oba polecenia działają lokalnie." }
+        ],
+        correctAnswer: "B",
+        topic: "Repozytoria i Git"
+    },
+
+    // === Lesson 11: Wprowadzenie do Bash ===
+    {
+        id: 31,
+        question: "Co oznacza shebang (#!/bin/bash) na początku skryptu Bash?",
+        code: "#!/bin/bash\necho \"Hello World\"",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Jest to komentarz opisujący skrypt", explanation: "Niepoprawnie. Shebang nie jest zwykłym komentarzem, ma specjalne znaczenie." },
+            { key: "B", text: "Wskazuje systemowi, jakiego interpretera użyć do wykonania skryptu", explanation: "Poprawnie! Shebang mówi systemowi, że skrypt ma być wykonany przez /bin/bash." },
+            { key: "C", text: "Deklaruje zmienną globalną", explanation: "Niepoprawnie. Shebang nie deklaruje zmiennych." },
+            { key: "D", text: "Importuje bibliotekę Bash", explanation: "Niepoprawnie. Bash nie ma systemu importów jak inne języki." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash - podstawy"
+    },
+    {
+        id: 32,
+        question: "Jaka jest różnica między cudzysłowami pojedynczymi '' a podwójnymi \"\" w Bash?",
+        code: "name=\"John\"\necho '$name'    # Wyświetla: $name\necho \"$name\"   # Wyświetla: John",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Nie ma różnicy, działają identycznie", explanation: "Niepoprawnie. Cudzysłowy mają różne zachowanie." },
+            { key: "B", text: "Pojedyncze '' traktują tekst dosłownie, podwójne \"\" pozwalają na podstawianie zmiennych", explanation: "Poprawnie! W '' wszystko jest literałem, w \"\" zmienne są rozwijane do wartości." },
+            { key: "C", text: "Pojedyncze '' są dla liczb, podwójne \"\" dla tekstu", explanation: "Niepoprawnie. Oba typy są dla tekstu, różnią się interpretacją zmiennych." },
+            { key: "D", text: "Podwójne \"\" są szybsze w wykonaniu", explanation: "Niepoprawnie. Różnica dotyczy interpretacji, nie wydajności." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash - podstawy"
+    },
+    {
+        id: 33,
+        question: "Co robi poniższy potok poleceń?",
+        code: "ps aux | grep nginx | awk '{print $2}' | xargs kill",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Instaluje nginx na serwerze", explanation: "Niepoprawnie. Ten potok nie instaluje nginx." },
+            { key: "B", text: "Wyświetla status usługi nginx", explanation: "Niepoprawnie. Potok kończy się na kill, więc coś zabija." },
+            { key: "C", text: "Znajduje procesy nginx, pobiera ich PID i je zatrzymuje (kill)", explanation: "Poprawnie! ps lista procesów → grep filtruje nginx → awk pobiera PID (kolumna 2) → xargs kill kończy procesy." },
+            { key: "D", text: "Restartuje serwer nginx", explanation: "Niepoprawnie. kill zatrzymuje procesy, nie restartuje usługi." }
+        ],
+        correctAnswer: "C",
+        topic: "Bash - podstawy"
+    },
+
+    // === Lesson 12: Bash w praktyce ===
+    {
+        id: 34,
+        question: "Do czego służy polecenie trap w Bash?",
+        code: "trap cleanup EXIT",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Przechwytuje błędy składniowe w skrypcie", explanation: "Niepoprawnie. trap nie sprawdza składni." },
+            { key: "B", text: "Rejestruje funkcję do wykonania przy określonym sygnale lub zdarzeniu (np. EXIT)", explanation: "Poprawnie! trap pozwala np. wywołać cleanup() automatycznie przy zakończeniu skryptu." },
+            { key: "C", text: "Blokuje sygnały systemowe", explanation: "Niepoprawnie. trap obsługuje sygnały, nie blokuje ich całkowicie." },
+            { key: "D", text: "Tworzy pułapkę na błędy użytkownika", explanation: "Niepoprawnie. trap to mechanizm obsługi sygnałów, nie walidacji." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash - zaawansowane"
+    },
+    {
+        id: 35,
+        question: "Co robi polecenie shift w kontekście parsowania parametrów skryptu?",
+        code: "while [[ $# -gt 0 ]]; do\n    case \"$1\" in\n        -v) verbose=1; shift ;;\n        -o) output=\"$2\"; shift 2 ;;\n    esac\ndone",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Sortuje parametry alfabetycznie", explanation: "Niepoprawnie. shift nie sortuje parametrów." },
+            { key: "B", text: "Przesuwa pozycyjne parametry w lewo, usuwając pierwszy ($1 staje się starym $2)", explanation: "Poprawnie! shift przesuwa parametry: $2→$1, $3→$2 itd. shift 2 przesuwa o 2 pozycje." },
+            { key: "C", text: "Konwertuje parametry na wielkie litery", explanation: "Niepoprawnie. shift nie zmienia wartości parametrów." },
+            { key: "D", text: "Dodaje nowy parametr na końcu listy", explanation: "Niepoprawnie. shift usuwa parametry z początku, nie dodaje." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash - zaawansowane"
+    },
+    {
+        id: 36,
+        question: "Co sprawdza polecenie kill -0 $pid?",
+        code: "if kill -0 \"$pid\" 2>/dev/null; then\n    echo \"Proces działa\"\nfi",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Natychmiast zatrzymuje proces o podanym PID", explanation: "Niepoprawnie. Sygnał 0 nie zatrzymuje procesu." },
+            { key: "B", text: "Sprawdza, czy proces o podanym PID istnieje (bez zatrzymywania go)", explanation: "Poprawnie! kill -0 to bezpieczny sposób sprawdzenia, czy proces istnieje - nie wysyła żadnego sygnału zatrzymującego." },
+            { key: "C", text: "Resetuje proces do stanu początkowego", explanation: "Niepoprawnie. kill -0 nie resetuje procesów." },
+            { key: "D", text: "Wyświetla informacje o procesie", explanation: "Niepoprawnie. Do wyświetlania informacji służy ps, nie kill." }
+        ],
+        correctAnswer: "B",
+        topic: "Bash - zaawansowane"
+    },
+
+    // === Lesson 13: Serwery WWW ===
+    {
+        id: 37,
+        question: "Co to jest serwer WWW?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Program przetwarzający żądania HTTP i wysyłający odpowiedzi (strony, pliki)", explanation: "Poprawnie! Serwer WWW (np. Nginx, Apache) odbiera żądania od przeglądarek i zwraca treści HTML, obrazy, pliki." },
+            { key: "B", text: "Fizyczny komputer podłączony do internetu", explanation: "Niepoprawnie. Serwer WWW to oprogramowanie, nie sprzęt (choć działa na serwerze fizycznym)." },
+            { key: "C", text: "Przeglądarka internetowa", explanation: "Niepoprawnie. Przeglądarka to klient, nie serwer." },
+            { key: "D", text: "Baza danych przechowująca strony", explanation: "Niepoprawnie. Baza danych to osobny komponent, nie serwer WWW." }
+        ],
+        correctAnswer: "A",
+        topic: "Serwery WWW"
+    },
+    {
+        id: 38,
+        question: "Co robi dyrektywa proxy_pass w konfiguracji Nginx?",
+        code: "location / {\n    proxy_pass http://127.0.0.1:8080;\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Blokuje dostęp do serwera", explanation: "Niepoprawnie. proxy_pass nie blokuje, lecz przekierowuje ruch." },
+            { key: "B", text: "Przekierowuje żądania do innego serwera (reverse proxy)", explanation: "Poprawnie! proxy_pass przekazuje żądania do backendu (np. Apache na porcie 8080), Nginx działa jako reverse proxy." },
+            { key: "C", text: "Ustawia hasło dostępu do strony", explanation: "Niepoprawnie. Do uwierzytelniania służą inne dyrektywy (auth_basic)." },
+            { key: "D", text: "Włącza kompresję gzip", explanation: "Niepoprawnie. Do kompresji służy dyrektywa gzip, nie proxy_pass." }
+        ],
+        correctAnswer: "B",
+        topic: "Serwery WWW"
+    },
+    {
+        id: 39,
+        question: "Gdzie Nginx przechowuje logi błędów i dostępu?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "/etc/nginx/logs/", explanation: "Niepoprawnie. /etc/ zawiera pliki konfiguracyjne, nie logi." },
+            { key: "B", text: "/var/log/nginx/access.log i /var/log/nginx/error.log", explanation: "Poprawnie! Standardowa lokalizacja logów Nginx to /var/log/nginx/." },
+            { key: "C", text: "/home/nginx/logs/", explanation: "Niepoprawnie. To nie jest standardowa lokalizacja logów." },
+            { key: "D", text: "/tmp/nginx/", explanation: "Niepoprawnie. /tmp/ to katalog tymczasowy, nie dla logów." }
+        ],
+        correctAnswer: "B",
+        topic: "Serwery WWW"
+    },
+
+    // === Lesson 14: Testowanie serwerów WWW ===
+    {
+        id: 40,
+        question: "Co to jest Apache JMeter?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Serwer WWW Apache", explanation: "Niepoprawnie. JMeter to narzędzie testowe, nie serwer WWW." },
+            { key: "B", text: "Darmowe narzędzie open-source do testowania wydajności i obciążenia aplikacji", explanation: "Poprawnie! JMeter symuluje wielu użytkowników i mierzy wydajność serwerów, API, baz danych." },
+            { key: "C", text: "Edytor kodu źródłowego", explanation: "Niepoprawnie. JMeter nie służy do edycji kodu." },
+            { key: "D", text: "System zarządzania bazą danych", explanation: "Niepoprawnie. JMeter testuje aplikacje, nie zarządza danymi." }
+        ],
+        correctAnswer: "B",
+        topic: "Testowanie serwerów WWW"
+    },
+    {
+        id: 41,
+        question: "Co to jest test obciążeniowy (load testing)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Sprawdzanie poprawności kodu źródłowego", explanation: "Niepoprawnie. To opisuje code review lub testy jednostkowe." },
+            { key: "B", text: "Symulowanie wielu użytkowników w celu sprawdzenia wydajności systemu pod obciążeniem", explanation: "Poprawnie! Load testing sprawdza jak system zachowuje się przy wielu jednoczesnych żądaniach." },
+            { key: "C", text: "Testowanie interfejsu użytkownika", explanation: "Niepoprawnie. To opisuje testy UI/UX." },
+            { key: "D", text: "Sprawdzanie bezpieczeństwa aplikacji", explanation: "Niepoprawnie. To opisuje testy penetracyjne." }
+        ],
+        correctAnswer: "B",
+        topic: "Testowanie serwerów WWW"
+    },
+    {
+        id: 42,
+        question: "W JMeter ustawiono Thread Group z 50 wątkami i Ramp-Up Period 10 sekund. Co to oznacza?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "50 użytkowników uruchomi się natychmiast", explanation: "Niepoprawnie. Ramp-Up Period oznacza stopniowe uruchamianie." },
+            { key: "B", text: "Co 10 sekund uruchomi się 1 użytkownik", explanation: "Niepoprawnie. 50 użytkowników w 10 sekund = 5 użytkowników na sekundę." },
+            { key: "C", text: "50 użytkowników uruchomi się stopniowo w ciągu 10 sekund (5 na sekundę)", explanation: "Poprawnie! Ramp-Up rozkłada uruchamianie wątków równomiernie w czasie." },
+            { key: "D", text: "Test będzie trwał 50 sekund", explanation: "Niepoprawnie. Liczba wątków nie określa czasu trwania testu." }
+        ],
+        correctAnswer: "C",
+        topic: "Testowanie serwerów WWW"
+    },
+
+    // === Lesson 15: SSL/TLS ===
+    {
+        id: 43,
+        question: "Co to jest TLS (Transport Layer Security)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Protokół kryptograficzny zapewniający bezpieczną komunikację w sieci", explanation: "Poprawnie! TLS (następca SSL) szyfruje komunikację, zapewnia integralność i uwierzytelnianie." },
+            { key: "B", text: "Typ serwera WWW", explanation: "Niepoprawnie. TLS to protokół bezpieczeństwa, nie serwer." },
+            { key: "C", text: "System plików sieciowych", explanation: "Niepoprawnie. TLS nie jest systemem plików." },
+            { key: "D", text: "Narzędzie do kompresji danych", explanation: "Niepoprawnie. TLS szyfruje dane, nie kompresuje." }
+        ],
+        correctAnswer: "A",
+        topic: "SSL/TLS"
+    },
+    {
+        id: 44,
+        question: "Jaka jest różnica między certyfikatem DV a EV?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "DV weryfikuje tylko domenę, EV dodatkowo weryfikuje tożsamość organizacji", explanation: "Poprawnie! DV (Domain Validation) sprawdza tylko własność domeny, EV (Extended Validation) wymaga weryfikacji firmy." },
+            { key: "B", text: "DV jest droższy niż EV", explanation: "Niepoprawnie. EV jest droższy ze względu na rozszerzoną weryfikację." },
+            { key: "C", text: "EV działa tylko w Chrome, DV wszędzie", explanation: "Niepoprawnie. Oba działają we wszystkich przeglądarkach." },
+            { key: "D", text: "Nie ma różnicy, to te same certyfikaty", explanation: "Niepoprawnie. Różnią się poziomem weryfikacji." }
+        ],
+        correctAnswer: "A",
+        topic: "SSL/TLS"
+    },
+    {
+        id: 45,
+        question: "Które polecenie OpenSSL wygeneruje klucz prywatny RSA 2048-bit?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "openssl req -new -key server.key", explanation: "Niepoprawnie. To tworzy CSR (Certificate Signing Request), nie klucz." },
+            { key: "B", text: "openssl genrsa -out private.key 2048", explanation: "Poprawnie! genrsa generuje klucz RSA, -out określa plik wyjściowy, 2048 to rozmiar w bitach." },
+            { key: "C", text: "openssl x509 -in cert.pem -text", explanation: "Niepoprawnie. To wyświetla informacje o certyfikacie, nie generuje klucza." },
+            { key: "D", text: "openssl s_client -connect example.com:443", explanation: "Niepoprawnie. To testuje połączenie SSL, nie generuje klucza." }
+        ],
+        correctAnswer: "B",
+        topic: "SSL/TLS"
+    },
+
+    // === Lesson 16: Bazy danych - część 1 ===
+    {
+        id: 46,
+        question: "Co to jest DBMS (Database Management System)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Oprogramowanie umożliwiające tworzenie, utrzymywanie i dostęp do baz danych", explanation: "Poprawnie! DBMS to system zarządzania bazą danych, np. MySQL, PostgreSQL, MongoDB." },
+            { key: "B", text: "Język programowania do tworzenia stron WWW", explanation: "Niepoprawnie. DBMS to oprogramowanie bazodanowe, nie język programowania." },
+            { key: "C", text: "Protokół sieciowy do przesyłania danych", explanation: "Niepoprawnie. DBMS nie jest protokołem sieciowym." },
+            { key: "D", text: "System operacyjny dla serwerów", explanation: "Niepoprawnie. DBMS to aplikacja działająca na systemie operacyjnym, nie system operacyjny." }
+        ],
+        correctAnswer: "A",
+        topic: "Bazy danych"
+    },
+    {
+        id: 47,
+        question: "Co oznacza skrót ACID w kontekście transakcji bazodanowych?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Access, Control, Identity, Data", explanation: "Niepoprawnie. To nie jest poprawne rozwinięcie skrótu ACID." },
+            { key: "B", text: "Atomicity, Consistency, Isolation, Durability", explanation: "Poprawnie! ACID to właściwości zapewniające niezawodność transakcji: Atomowość, Spójność, Izolacja, Trwałość." },
+            { key: "C", text: "Authentication, Caching, Indexing, Distribution", explanation: "Niepoprawnie. To nie są właściwości transakcji ACID." },
+            { key: "D", text: "Automatic, Concurrent, Integrated, Distributed", explanation: "Niepoprawnie. To nie jest poprawne rozwinięcie skrótu ACID." }
+        ],
+        correctAnswer: "B",
+        topic: "Bazy danych"
+    },
+    {
+        id: 48,
+        question: "Co zwróci poniższe zapytanie SQL?",
+        code: "SELECT k.imie, k.nazwisko\nFROM klienci k\nJOIN zamowienia z ON k.id = z.klient_id\nWHERE z.suma > (SELECT AVG(suma) FROM zamowienia);",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Wszystkich klientów posortowanych według sumy zamówień", explanation: "Niepoprawnie. Zapytanie nie zawiera ORDER BY i nie zwraca wszystkich klientów." },
+            { key: "B", text: "Klientów, którzy złożyli zamówienia o wartości powyżej średniej", explanation: "Poprawnie! Podzapytanie oblicza średnią wartość zamówień, a główne zapytanie zwraca klientów z zamówieniami powyżej tej średniej." },
+            { key: "C", text: "Średnią wartość zamówień każdego klienta", explanation: "Niepoprawnie. Zapytanie nie używa funkcji agregującej AVG w głównym SELECT." },
+            { key: "D", text: "Liczbę zamówień każdego klienta", explanation: "Niepoprawnie. Zapytanie nie liczy zamówień, tylko zwraca imię i nazwisko." }
+        ],
+        correctAnswer: "B",
+        topic: "Bazy danych"
+    },
+
+    // === Lesson 17: Bazy danych - część 2 (HA) ===
+    {
+        id: 49,
+        question: "Co to jest tolerancja błędów (fault tolerance) w kontekście baz danych?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Zdolność systemu do kontynuowania pracy mimo awarii jego komponentów", explanation: "Poprawnie! Tolerancja błędów zapewnia nieprzerwany dostęp do danych nawet w przypadku awarii sprzętu lub oprogramowania." },
+            { key: "B", text: "Ignorowanie błędów składniowych w zapytaniach SQL", explanation: "Niepoprawnie. Tolerancja błędów dotyczy awarii systemu, nie błędów składniowych." },
+            { key: "C", text: "Automatyczne naprawianie uszkodzonych danych", explanation: "Niepoprawnie. To opisuje raczej mechanizmy naprawy, nie tolerancję błędów." },
+            { key: "D", text: "Ograniczenie liczby użytkowników, którzy mogą jednocześnie korzystać z bazy", explanation: "Niepoprawnie. To opisuje limit połączeń, nie tolerancję błędów." }
+        ],
+        correctAnswer: "A",
+        topic: "Bazy danych - wysoka dostępność"
+    },
+    {
+        id: 50,
+        question: "Jaka jest różnica między klastrem active-passive a active-active?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Active-passive używa replikacji, active-active nie", explanation: "Niepoprawnie. Oba typy klastrów mogą używać replikacji." },
+            { key: "B", text: "W active-passive jeden serwer obsługuje żądania, w active-active wszystkie serwery są aktywne", explanation: "Poprawnie! W active-passive serwer pasywny czeka na przejęcie w razie awarii, w active-active wszystkie węzły obsługują ruch." },
+            { key: "C", text: "Active-active jest wolniejszy, ale bardziej niezawodny", explanation: "Niepoprawnie. Active-active zazwyczaj oferuje lepszą wydajność przez rozkładanie obciążenia." },
+            { key: "D", text: "Nie ma różnicy, to synonimy", explanation: "Niepoprawnie. To dwa różne podejścia do architektur wysokiej dostępności." }
+        ],
+        correctAnswer: "B",
+        topic: "Bazy danych - wysoka dostępność"
+    },
+    {
+        id: 51,
+        question: "Co robi PgBouncer w architekturze bazodanowej?",
+        code: "[pgbouncer]\nlisten_port = 6432\npool_mode = transaction\nmax_client_conn = 1000\ndefault_pool_size = 20",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tworzy kopie zapasowe bazy danych PostgreSQL", explanation: "Niepoprawnie. PgBouncer nie zajmuje się kopiami zapasowymi." },
+            { key: "B", text: "Zarządza pulą połączeń między aplikacjami a bazą danych", explanation: "Poprawnie! PgBouncer to connection pooler - pozwala wielu klientom (1000) korzystać z ograniczonej liczby połączeń do bazy (20)." },
+            { key: "C", text: "Replikuje dane między serwerami PostgreSQL", explanation: "Niepoprawnie. Do replikacji służą inne narzędzia jak Patroni czy wbudowana replikacja PostgreSQL." },
+            { key: "D", text: "Monitoruje wydajność zapytań SQL", explanation: "Niepoprawnie. PgBouncer nie jest narzędziem monitorującym." }
+        ],
+        correctAnswer: "B",
+        topic: "Bazy danych - wysoka dostępność"
+    },
+
+    // === Lesson 18: Zarządzanie konfiguracją - część 1 ===
+    {
+        id: 52,
+        question: "Co to jest Ansible?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Narzędzie do automatyzacji IT bez konieczności instalacji agentów na zarządzanych maszynach", explanation: "Poprawnie! Ansible jest agentless - używa SSH do komunikacji i nie wymaga instalacji oprogramowania na zarządzanych serwerach." },
+            { key: "B", text: "System operacyjny dla serwerów", explanation: "Niepoprawnie. Ansible to narzędzie do zarządzania konfiguracją, nie system operacyjny." },
+            { key: "C", text: "Baza danych NoSQL", explanation: "Niepoprawnie. Ansible nie jest bazą danych." },
+            { key: "D", text: "Język programowania do tworzenia aplikacji webowych", explanation: "Niepoprawnie. Ansible to narzędzie automatyzacji, nie język programowania." }
+        ],
+        correctAnswer: "A",
+        topic: "Zarządzanie konfiguracją"
+    },
+    {
+        id: 53,
+        question: "Co oznacza idempotencja w kontekście zarządzania konfiguracją?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Każde uruchomienie konfiguracji tworzy nowe zasoby", explanation: "Niepoprawnie. To byłoby przeciwieństwem idempotencji." },
+            { key: "B", text: "Wielokrotne wykonanie operacji daje ten sam rezultat co pojedyncze wykonanie", explanation: "Poprawnie! Idempotencja oznacza, że powtórne uruchomienie playbooka nie zmieni systemu, jeśli jest już w pożądanym stanie." },
+            { key: "C", text: "Konfiguracja musi być wykonana dokładnie raz", explanation: "Niepoprawnie. Idempotencja pozwala na wielokrotne bezpieczne wykonanie." },
+            { key: "D", text: "System automatycznie cofa zmiany po restarcie", explanation: "Niepoprawnie. Idempotencja nie dotyczy cofania zmian." }
+        ],
+        correctAnswer: "B",
+        topic: "Zarządzanie konfiguracją"
+    },
+    {
+        id: 54,
+        question: "Co robi poniższy playbook Ansible?",
+        code: "- name: Configure webserver\n  hosts: web_servers\n  become: true\n  tasks:\n    - name: Install nginx\n      apt:\n        name: nginx\n        state: present\n    - name: Start nginx\n      service:\n        name: nginx\n        state: started\n        enabled: true",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Usuwa nginx ze wszystkich serwerów", explanation: "Niepoprawnie. state: present oznacza instalację, nie usunięcie." },
+            { key: "B", text: "Instaluje nginx i uruchamia go na serwerach z grupy web_servers", explanation: "Poprawnie! Playbook instaluje pakiet nginx (state: present), uruchamia usługę (state: started) i włącza autostart (enabled: true)." },
+            { key: "C", text: "Tylko sprawdza czy nginx jest zainstalowany", explanation: "Niepoprawnie. Playbook faktycznie instaluje i konfiguruje nginx." },
+            { key: "D", text: "Restartuje nginx na wszystkich serwerach", explanation: "Niepoprawnie. state: started uruchamia usługę, nie restartuje (do restartu służy state: restarted)." }
+        ],
+        correctAnswer: "B",
+        topic: "Zarządzanie konfiguracją"
+    },
+
+    // === Lesson 19: Zarządzanie konfiguracją - część 2 ===
+    {
+        id: 55,
+        question: "Co to jest rola (role) w Ansible?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Mechanizm organizacji kodu poprzez grupowanie zadań, zmiennych, plików i szablonów", explanation: "Poprawnie! Role pozwalają na modularyzację, ponowne użycie kodu i uporządkowanie konfiguracji według funkcjonalności." },
+            { key: "B", text: "Typ użytkownika z określonymi uprawnieniami", explanation: "Niepoprawnie. W Ansible role to struktura organizacyjna, nie uprawnienia użytkowników." },
+            { key: "C", text: "Polecenie do uruchamiania playbooków", explanation: "Niepoprawnie. Do uruchamiania playbooków służy ansible-playbook." },
+            { key: "D", text: "Plik konfiguracyjny SSH", explanation: "Niepoprawnie. Role nie są związane bezpośrednio z konfiguracją SSH." }
+        ],
+        correctAnswer: "A",
+        topic: "Ansible - zaawansowane"
+    },
+    {
+        id: 56,
+        question: "Jaki jest priorytet zmiennych w strukturze roli Ansible?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "defaults ma wyższy priorytet niż vars", explanation: "Niepoprawnie. To odwrotnie - vars ma wyższy priorytet." },
+            { key: "B", text: "vars ma wyższy priorytet niż defaults", explanation: "Poprawnie! Zmienne w vars/ nadpisują te z defaults/, co pozwala definiować sensowne wartości domyślne, które można łatwo nadpisać." },
+            { key: "C", text: "Oba katalogi mają ten sam priorytet", explanation: "Niepoprawnie. Ansible ma ściśle określoną hierarchię priorytetów zmiennych." },
+            { key: "D", text: "Priorytet zależy od kolejności alfabetycznej plików", explanation: "Niepoprawnie. Priorytet jest zdefiniowany przez typ źródła zmiennej, nie nazwę pliku." }
+        ],
+        correctAnswer: "B",
+        topic: "Ansible - zaawansowane"
+    },
+    {
+        id: 57,
+        question: "Jak uruchomić playbook dla środowiska produkcyjnego przy podejściu wielokatalogowym?",
+        code: "environments/\n├── development/\n│   ├── inventory.ini\n│   └── group_vars/\n├── staging/\n│   ├── inventory.ini\n│   └── group_vars/\n└── production/\n    ├── inventory.ini\n    └── group_vars/",
+        type: "multiple",
+        options: [
+            { key: "A", text: "ansible-playbook --env production site.yml", explanation: "Niepoprawnie. Nie ma flagi --env w Ansible." },
+            { key: "B", text: "ansible-playbook -i environments/production/inventory.ini site.yml", explanation: "Poprawnie! Flaga -i wskazuje ścieżkę do inwentarza, który zawiera hosty i zmienne specyficzne dla środowiska." },
+            { key: "C", text: "ansible-playbook site.yml production", explanation: "Niepoprawnie. Środowisko nie jest podawane jako argument pozycyjny." },
+            { key: "D", text: "cd production && ansible-playbook site.yml", explanation: "Niepoprawnie. Zmiana katalogu nie jest wymagana - wystarczy podać ścieżkę do inwentarza." }
+        ],
+        correctAnswer: "B",
+        topic: "Ansible - zaawansowane"
+    },
+
+    // === Lesson 20: Docker - część 1 ===
+    {
+        id: 58,
+        question: "Co to jest Docker?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "System zarządzania kontenerami umożliwiający izolowane środowiska dla aplikacji", explanation: "Poprawnie! Docker pozwala pakować aplikacje z zależnościami w kontenery, które są przenośne i szybkie w uruchomieniu." },
+            { key: "B", text: "System operacyjny dla serwerów", explanation: "Niepoprawnie. Docker działa na istniejących systemach operacyjnych, nie jest osobnym OS." },
+            { key: "C", text: "Język programowania do tworzenia mikroserwisów", explanation: "Niepoprawnie. Docker to platforma konteneryzacji, nie język programowania." },
+            { key: "D", text: "Baza danych NoSQL", explanation: "Niepoprawnie. Docker nie jest bazą danych." }
+        ],
+        correctAnswer: "A",
+        topic: "Docker - podstawy"
+    },
+    {
+        id: 59,
+        question: "Jaka jest główna różnica między architekturą monolityczną a mikrousługami?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Monolit jest szybszy, mikrousługi są wolniejsze", explanation: "Niepoprawnie. Wydajność zależy od implementacji, nie od architektury." },
+            { key: "B", text: "W monolicie cała logika jest w jednym procesie, mikrousługi to niezależnie wdrażalne usługi", explanation: "Poprawnie! Monolit wymaga przebudowy całości przy zmianach, mikrousługi pozwalają wdrażać tylko zmienione komponenty." },
+            { key: "C", text: "Monolit używa jednego języka, mikrousługi wielu", explanation: "Niepoprawnie. Monolit może używać wielu języków, a mikrousługi jednego." },
+            { key: "D", text: "Nie ma różnicy, to synonimy", explanation: "Niepoprawnie. To dwa różne podejścia architektoniczne." }
+        ],
+        correctAnswer: "B",
+        topic: "Docker - podstawy"
+    },
+    {
+        id: 60,
+        question: "Co robi poniższe polecenie Docker?",
+        code: "docker run -d --name my_nginx -p 8080:80 nginx",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Pobiera obraz nginx bez uruchamiania", explanation: "Niepoprawnie. docker run uruchamia kontener, nie tylko pobiera obraz." },
+            { key: "B", text: "Uruchamia kontener nginx w tle, mapując port 8080 hosta na port 80 kontenera", explanation: "Poprawnie! Flaga -d to tryb detached (w tle), --name nadaje nazwę, -p mapuje porty host:kontener." },
+            { key: "C", text: "Usuwa kontener o nazwie my_nginx", explanation: "Niepoprawnie. Do usuwania służy docker rm, nie docker run." },
+            { key: "D", text: "Wyświetla logi kontenera nginx", explanation: "Niepoprawnie. Do logów służy docker logs, nie docker run." }
+        ],
+        correctAnswer: "B",
+        topic: "Docker - podstawy"
+    },
+
+    // === Lesson 21: Docker - część 2 ===
+    {
+        id: 61,
+        question: "Co to jest wolumin (volume) w Dockerze?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Mechanizm trwałego przechowywania danych niezależnie od cyklu życia kontenera", explanation: "Poprawnie! Woluminy pozwalają zachować dane nawet po usunięciu kontenera i współdzielić je między kontenerami." },
+            { key: "B", text: "Rodzaj sieci wirtualnej", explanation: "Niepoprawnie. Sieci i woluminy to różne koncepcje w Dockerze." },
+            { key: "C", text: "Warstwa obrazu Docker", explanation: "Niepoprawnie. Woluminy są zewnętrzne wobec warstw obrazu." },
+            { key: "D", text: "Polecenie do zwiększania zasobów kontenera", explanation: "Niepoprawnie. Woluminy dotyczą przechowywania danych, nie zasobów." }
+        ],
+        correctAnswer: "A",
+        topic: "Docker - zaawansowane"
+    },
+    {
+        id: 62,
+        question: "Jaki typ sieci jest domyślny w Dockerze i co zapewnia?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "host - kontener współdzieli stos sieciowy hosta", explanation: "Niepoprawnie. Host to osobny typ sieci, nie domyślny." },
+            { key: "B", text: "bridge - tworzy izolowaną sieć z NAT do sieci hosta", explanation: "Poprawnie! Bridge (most) jest domyślny, izoluje kontenery i zapewnia NAT do komunikacji zewnętrznej." },
+            { key: "C", text: "none - brak sieci", explanation: "Niepoprawnie. None całkowicie wyłącza sieć, nie jest domyślny." },
+            { key: "D", text: "overlay - sieć rozproszona między hostami", explanation: "Niepoprawnie. Overlay służy do klastrów Docker Swarm, nie jest domyślny." }
+        ],
+        correctAnswer: "B",
+        topic: "Docker - zaawansowane"
+    },
+    {
+        id: 63,
+        question: "Co zwróci poniższe polecenie?",
+        code: "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' my_container",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Pełne informacje o kontenerze w formacie JSON", explanation: "Niepoprawnie. Flaga -f filtruje wynik do określonego pola." },
+            { key: "B", text: "Adres IP kontenera", explanation: "Poprawnie! Szablon Go wybiera pole IPAddress z ustawień sieciowych kontenera." },
+            { key: "C", text: "Listę wszystkich kontenerów w sieci", explanation: "Niepoprawnie. Polecenie dotyczy jednego kontenera, nie listy." },
+            { key: "D", text: "Logi sieciowe kontenera", explanation: "Niepoprawnie. docker inspect zwraca konfigurację, nie logi." }
+        ],
+        correctAnswer: "B",
+        topic: "Docker - zaawansowane"
+    },
+
+    // === Lesson 22: Dockerfile i docker-compose ===
+    {
+        id: 64,
+        question: "Co to jest Dockerfile?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Plik konfiguracyjny opisujący instrukcje do budowania obrazu Docker", explanation: "Poprawnie! Dockerfile zawiera sekwencję instrukcji (FROM, RUN, COPY, CMD itd.), które Docker wykonuje podczas budowania obrazu." },
+            { key: "B", text: "Baza danych przechowująca obrazy kontenerów", explanation: "Niepoprawnie. Obrazy przechowuje Docker Hub lub lokalny rejestr, nie Dockerfile." },
+            { key: "C", text: "Plik logów kontenera Docker", explanation: "Niepoprawnie. Logi są osobnym mechanizmem, nie mają związku z Dockerfile." },
+            { key: "D", text: "Narzędzie graficzne do zarządzania kontenerami", explanation: "Niepoprawnie. Dockerfile to plik tekstowy, nie narzędzie graficzne." }
+        ],
+        correctAnswer: "A",
+        topic: "Dockerfile i docker-compose"
+    },
+    {
+        id: 65,
+        question: "Jaka jest różnica między instrukcjami CMD a ENTRYPOINT w Dockerfile?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "CMD i ENTRYPOINT są synonimami i działają identycznie", explanation: "Niepoprawnie. Mają różne zachowania względem argumentów docker run." },
+            { key: "B", text: "CMD określa domyślne polecenie, które można zastąpić; ENTRYPOINT to główny program, a argumenty są przekazywane jako parametry", explanation: "Poprawnie! CMD można nadpisać przez argumenty docker run, natomiast ENTRYPOINT definiuje stały punkt wejścia, do którego argumenty są dołączane." },
+            { key: "C", text: "CMD uruchamia procesy w tle, ENTRYPOINT na pierwszym planie", explanation: "Niepoprawnie. Oba mogą uruchamiać procesy na pierwszym planie." },
+            { key: "D", text: "ENTRYPOINT jest przestarzały i należy używać tylko CMD", explanation: "Niepoprawnie. Oba są aktywnie używane i mają swoje zastosowania." }
+        ],
+        correctAnswer: "B",
+        topic: "Dockerfile i docker-compose"
+    },
+    {
+        id: 66,
+        question: "Co robi poniższy plik docker-compose.yml?",
+        code: "version: '3'\nservices:\n  web:\n    build: .\n    ports:\n      - \"5000:5000\"\n    depends_on:\n      - redis\n  redis:\n    image: redis:alpine",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Uruchamia tylko serwer Redis", explanation: "Niepoprawnie. Plik definiuje dwie usługi: web i redis." },
+            { key: "B", text: "Buduje obraz web z bieżącego katalogu i uruchamia go wraz z Redis, mapując port 5000", explanation: "Poprawnie! build: . buduje obraz z Dockerfile w bieżącym katalogu, depends_on zapewnia uruchomienie redis przed web, ports mapuje port 5000." },
+            { key: "C", text: "Pobiera gotowe obrazy web i redis bez budowania", explanation: "Niepoprawnie. Usługa web używa build:, więc obraz jest budowany lokalnie." },
+            { key: "D", text: "Tworzy sieć między serwerami w chmurze", explanation: "Niepoprawnie. Docker Compose działa lokalnie, nie w chmurze." }
+        ],
+        correctAnswer: "B",
+        topic: "Dockerfile i docker-compose"
+    },
+
+    // === Lesson 22: Python - część 1 ===
+    {
+        id: 67,
+        question: "Co to jest Python?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Interpretowany język programowania wysokiego poziomu z dynamicznym typowaniem", explanation: "Poprawnie! Python jest interpretowany (nie kompilowany), ma czytelną składnię i automatycznie określa typy zmiennych podczas wykonania." },
+            { key: "B", text: "Kompilowany język niskiego poziomu podobny do C", explanation: "Niepoprawnie. Python jest interpretowany i wysokiego poziomu, w przeciwieństwie do C." },
+            { key: "C", text: "Framework do tworzenia stron internetowych", explanation: "Niepoprawnie. Django i Flask to frameworki, Python to język programowania." },
+            { key: "D", text: "Baza danych NoSQL", explanation: "Niepoprawnie. Python nie jest bazą danych." }
+        ],
+        correctAnswer: "A",
+        topic: "Python - podstawy"
+    },
+    {
+        id: 68,
+        question: "Jak Python definiuje bloki kodu?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Za pomocą nawiasów klamrowych { }", explanation: "Niepoprawnie. Nawiasy klamrowe używane są w językach takich jak C, Java, JavaScript." },
+            { key: "B", text: "Za pomocą wcięć (indentacji)", explanation: "Poprawnie! Python używa wcięć (spacje lub tabulatory) do oznaczania bloków kodu, co wymusza czytelność kodu." },
+            { key: "C", text: "Za pomocą słów kluczowych begin/end", explanation: "Niepoprawnie. To składnia używana w językach takich jak Pascal." },
+            { key: "D", text: "Python nie ma bloków kodu", explanation: "Niepoprawnie. Python oczywiście ma bloki kodu (w funkcjach, pętlach, warunkach)." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - podstawy"
+    },
+    {
+        id: 69,
+        question: "Co wyświetli poniższy kod Python?",
+        code: "x = 10\ny = 3\nprint(x // y)\nprint(x % y)",
+        type: "multiple",
+        options: [
+            { key: "A", text: "3.33 i 1", explanation: "Niepoprawnie. Operator // zwraca liczbę całkowitą, nie zmiennoprzecinkową." },
+            { key: "B", text: "3 i 1", explanation: "Poprawnie! Operator // to dzielenie całkowitoliczbowe (10//3=3), a % to reszta z dzielenia (10%3=1)." },
+            { key: "C", text: "10 i 3", explanation: "Niepoprawnie. To byłyby wartości x i y, nie wyniki operacji." },
+            { key: "D", text: "Błąd - te operatory nie istnieją w Pythonie", explanation: "Niepoprawnie. // i % to standardowe operatory Pythona." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - podstawy"
+    },
+
+    // === Lesson 23: Python - część 1 (funkcje, struktury danych) ===
+    {
+        id: 70,
+        question: "Co to jest funkcja w Pythonie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Blok kodu wielokrotnego użytku definiowany słowem kluczowym def", explanation: "Poprawnie! Funkcje pozwalają grupować kod, który może być wywoływany wielokrotnie z różnymi argumentami." },
+            { key: "B", text: "Typ zmiennej przechowującej liczby", explanation: "Niepoprawnie. Funkcja to nie typ zmiennej, lecz struktura organizacyjna kodu." },
+            { key: "C", text: "Pętla wykonująca się określoną liczbę razy", explanation: "Niepoprawnie. To opisuje pętlę for, nie funkcję." },
+            { key: "D", text: "Warunek sprawdzający wartość logiczną", explanation: "Niepoprawnie. To opisuje instrukcję if, nie funkcję." }
+        ],
+        correctAnswer: "A",
+        topic: "Python - funkcje"
+    },
+    {
+        id: 71,
+        question: "Jaka jest główna różnica między listą (list) a krotką (tuple) w Pythonie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Listy używają nawiasów okrągłych, krotki kwadratowych", explanation: "Niepoprawnie. Jest odwrotnie: listy używają [], krotki ()." },
+            { key: "B", text: "Listy są modyfikowalne (mutable), krotki są niemodyfikowalne (immutable)", explanation: "Poprawnie! Po utworzeniu krotki nie można zmienić jej elementów, natomiast listę można modyfikować (dodawać, usuwać, zmieniać elementy)." },
+            { key: "C", text: "Listy mogą zawierać tylko liczby, krotki dowolne typy", explanation: "Niepoprawnie. Oba typy mogą zawierać elementy różnych typów." },
+            { key: "D", text: "Krotki są szybsze w tworzeniu, ale wolniejsze w dostępie", explanation: "Niepoprawnie. Krotki są generalnie szybsze i zajmują mniej pamięci niż listy." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - struktury danych"
+    },
+    {
+        id: 72,
+        question: "Co wyświetli poniższy kod?",
+        code: "text = \"PROGRAM\"\nprint(text[1:4])\nprint(text[::-1])",
+        type: "multiple",
+        options: [
+            { key: "A", text: "PRO i MARGORP", explanation: "Niepoprawnie. text[1:4] zaczyna od indeksu 1, nie 0." },
+            { key: "B", text: "ROG i MARGORP", explanation: "Poprawnie! text[1:4] zwraca znaki od indeksu 1 do 3 ('ROG'), a text[::-1] odwraca string." },
+            { key: "C", text: "ROGR i PROGRAM", explanation: "Niepoprawnie. [::-1] odwraca string, nie zwraca oryginału." },
+            { key: "D", text: "Błąd - nieprawidłowa składnia slicing", explanation: "Niepoprawnie. Składnia jest poprawna i często używana w Pythonie." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - stringi"
+    },
+
+    // === Lesson 23: Python - część 2 (zmienne, pętle, słowniki) ===
+    {
+        id: 73,
+        question: "Co to jest słownik (dict) w Pythonie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Struktura danych przechowująca pary klucz-wartość z unikalnymi kluczami", explanation: "Poprawnie! Słownik pozwala na szybki dostęp do wartości poprzez klucz, np. person['name'] zwraca wartość przypisaną do klucza 'name'." },
+            { key: "B", text: "Lista uporządkowanych elementów z dostępem przez indeks", explanation: "Niepoprawnie. To opisuje listę, nie słownik." },
+            { key: "C", text: "Niemodyfikowalna sekwencja elementów", explanation: "Niepoprawnie. To opisuje krotkę, a słowniki są modyfikowalne." },
+            { key: "D", text: "Funkcja do tłumaczenia tekstu na inne języki", explanation: "Niepoprawnie. Słownik w Pythonie to struktura danych, nie funkcja tłumacząca." }
+        ],
+        correctAnswer: "A",
+        topic: "Python - słowniki"
+    },
+    {
+        id: 74,
+        question: "Kiedy używamy pętli while zamiast for w Pythonie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tylko gdy iterujemy po listach", explanation: "Niepoprawnie. Do iteracji po listach lepiej nadaje się pętla for." },
+            { key: "B", text: "Gdy nie znamy z góry liczby iteracji i kontynuujemy dopóki warunek jest spełniony", explanation: "Poprawnie! while wykonuje się dopóki warunek jest True, np. czytanie danych do napotkania końca pliku lub oczekiwanie na odpowiedź użytkownika." },
+            { key: "C", text: "while jest przestarzały i zawsze używamy for", explanation: "Niepoprawnie. Oba typy pętli mają swoje zastosowania." },
+            { key: "D", text: "while jest szybszy niż for", explanation: "Niepoprawnie. Wybór zależy od logiki programu, nie wydajności." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - pętle"
+    },
+    {
+        id: 75,
+        question: "Jak uzyskać dostęp do listy umiejętności Jana w poniższym słowniku?",
+        code: "employees = {\n    \"John\": {\n        \"age\": 25,\n        \"skills\": [\"Python\", \"JavaScript\"]\n    }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "employees.John.skills", explanation: "Niepoprawnie. Python używa nawiasów kwadratowych, nie notacji kropkowej do dostępu do słowników." },
+            { key: "B", text: "employees[\"John\"][\"skills\"]", explanation: "Poprawnie! Dostęp do zagnieżdżonych słowników wymaga kolejnych nawiasów kwadratowych z kluczami." },
+            { key: "C", text: "employees.get(John, skills)", explanation: "Niepoprawnie. Metoda get() przyjmuje jeden klucz i opcjonalną wartość domyślną." },
+            { key: "D", text: "employees[0][1]", explanation: "Niepoprawnie. Słowniki używają kluczy (stringów), nie indeksów numerycznych." }
+        ],
+        correctAnswer: "B",
+        topic: "Python - słowniki"
+    },
+
+    // === Lesson 24: Python dla DevOps (os, pathlib, JSON, YAML, requests) ===
+    {
+        id: 76,
+        question: "Do czego służy biblioteka pathlib w Pythonie?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Do obiektowej pracy ze ścieżkami plików, niezależnej od systemu operacyjnego", explanation: "Poprawnie! pathlib traktuje ścieżki jako obiekty i automatycznie obsługuje różnice między Windows (\\) a Linux (/)." },
+            { key: "B", text: "Do wysyłania żądań HTTP", explanation: "Niepoprawnie. Do HTTP służy biblioteka requests." },
+            { key: "C", text: "Do parsowania plików JSON", explanation: "Niepoprawnie. Do JSON służy moduł json." },
+            { key: "D", text: "Do łączenia się z bazami danych", explanation: "Niepoprawnie. pathlib dotyczy tylko ścieżek w systemie plików." }
+        ],
+        correctAnswer: "A",
+        topic: "Python dla DevOps"
+    },
+    {
+        id: 77,
+        question: "Jaka jest główna różnica między formatami JSON a YAML w kontekście DevOps?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "JSON jest szybszy, YAML wolniejszy", explanation: "Niepoprawnie. Różnica w wydajności jest minimalna i zależy od implementacji." },
+            { key: "B", text: "JSON używa nawiasów i nie wspiera komentarzy; YAML używa wcięć i wspiera komentarze", explanation: "Poprawnie! YAML jest bardziej czytelny dla człowieka (używa wcięć jak Python) i pozwala na komentarze (#), dlatego jest preferowany w Kubernetes, Ansible, Docker Compose." },
+            { key: "C", text: "JSON jest tylko do odczytu, YAML do zapisu", explanation: "Niepoprawnie. Oba formaty można odczytywać i zapisywać." },
+            { key: "D", text: "YAML jest przestarzały i zastępowany przez JSON", explanation: "Niepoprawnie. YAML jest aktywnie używany w narzędziach DevOps." }
+        ],
+        correctAnswer: "B",
+        topic: "Python dla DevOps"
+    },
+    {
+        id: 78,
+        question: "Co robi poniższy kod?",
+        code: "import subprocess\nresult = subprocess.run([\"ls\", \"-l\"], capture_output=True, text=True)\nprint(result.stdout)",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Wyświetla zawartość pliku ls", explanation: "Niepoprawnie. ls to polecenie systemowe, nie plik." },
+            { key: "B", text: "Uruchamia polecenie ls -l i wyświetla jego wynik (listę plików z detalami)", explanation: "Poprawnie! subprocess.run() wykonuje zewnętrzne polecenie, capture_output=True przechwytuje wynik, a text=True zwraca string zamiast bajtów." },
+            { key: "C", text: "Tworzy nowy katalog o nazwie ls", explanation: "Niepoprawnie. ls wyświetla zawartość katalogu, nie tworzy katalogów." },
+            { key: "D", text: "Zwraca błąd, bo subprocess nie obsługuje list jako argumentów", explanation: "Niepoprawnie. Lista argumentów to preferowany sposób przekazywania polecenia do subprocess.run()." }
+        ],
+        correctAnswer: "B",
+        topic: "Python dla DevOps"
+    },
+
+    // === Lesson 25: CI/CD - część 1 (wprowadzenie, Jenkins) ===
+    {
+        id: 79,
+        question: "Co to jest ciągła integracja (Continuous Integration, CI)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Metodologia rozwoju oprogramowania z automatycznym budowaniem i testowaniem przy każdej zmianie kodu", explanation: "Poprawnie! CI polega na regularnym commitowaniu kodu do wspólnego repozytorium, gdzie automatycznie uruchamiane są buildy i testy." },
+            { key: "B", text: "Narzędzie do tworzenia kopii zapasowych", explanation: "Niepoprawnie. CI dotyczy procesu wytwarzania oprogramowania, nie backupów." },
+            { key: "C", text: "Typ bazy danych NoSQL", explanation: "Niepoprawnie. CI to metodologia, nie technologia bazodanowa." },
+            { key: "D", text: "Framework do tworzenia interfejsów użytkownika", explanation: "Niepoprawnie. CI to praktyka DevOps, nie framework UI." }
+        ],
+        correctAnswer: "A",
+        topic: "CI/CD - podstawy"
+    },
+    {
+        id: 80,
+        question: "Jakie są główne etapy w metodologii CI/CD?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tylko pisanie kodu i testowanie", explanation: "Niepoprawnie. CI/CD obejmuje znacznie więcej etapów." },
+            { key: "B", text: "Kod → Build → Test → Release → Deploy → Monitoring → Planowanie", explanation: "Poprawnie! CI/CD to pełen cykl od napisania kodu przez budowanie, testy, wydanie, wdrożenie, monitoring aż do planowania kolejnych funkcji." },
+            { key: "C", text: "Tylko deployment na serwer produkcyjny", explanation: "Niepoprawnie. Deploy to tylko jeden z wielu etapów." },
+            { key: "D", text: "Instalacja Jenkins i uruchamianie skryptów", explanation: "Niepoprawnie. Jenkins to narzędzie, nie etap CI/CD." }
+        ],
+        correctAnswer: "B",
+        topic: "CI/CD - podstawy"
+    },
+    {
+        id: 81,
+        question: "Co wyróżnia Jenkins spośród innych systemów CI?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Jest płatny i działa tylko z GitHubem", explanation: "Niepoprawnie. Jenkins jest darmowy i open-source, działa z wieloma VCS." },
+            { key: "B", text: "Jest open-source, posiada setki wtyczek i oferuje pełną kontrolę nad środowiskiem", explanation: "Poprawnie! Jenkins jest darmowy, wysoce konfigurowalny dzięki wtyczkom i może być zainstalowany na własnej infrastrukturze." },
+            { key: "C", text: "Nie wymaga Java do działania", explanation: "Niepoprawnie. Jenkins wymaga Java Runtime Environment." },
+            { key: "D", text: "Działa tylko w chmurze AWS", explanation: "Niepoprawnie. Jenkins można zainstalować lokalnie, w chmurze lub hybrydowo." }
+        ],
+        correctAnswer: "B",
+        topic: "CI/CD - Jenkins"
+    },
+
+    // === Lesson 26: CI/CD - część 2 (Jenkins Pipeline, Groovy, Job DSL) ===
+    {
+        id: 82,
+        question: "Co to jest Jenkinsfile?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Plik zawierający opis pipeline'u CI/CD napisany w języku Groovy", explanation: "Poprawnie! Jenkinsfile definiuje etapy (stages), kroki (steps) i konfigurację pipeline'u jako kod, który można wersjonować w repozytorium." },
+            { key: "B", text: "Plik konfiguracyjny serwera Jenkins", explanation: "Niepoprawnie. Konfiguracja serwera to osobne pliki, Jenkinsfile opisuje pipeline." },
+            { key: "C", text: "Log z wykonania zadania", explanation: "Niepoprawnie. Logi są generowane automatycznie, Jenkinsfile to kod źródłowy pipeline'u." },
+            { key: "D", text: "Plik z hasłami użytkowników Jenkins", explanation: "Niepoprawnie. Hasła są przechowywane w innych mechanizmach (credentials)." }
+        ],
+        correctAnswer: "A",
+        topic: "Jenkins Pipeline"
+    },
+    {
+        id: 83,
+        question: "Do czego służy blok 'when' w Jenkins Pipeline?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Do definiowania zmiennych środowiskowych", explanation: "Niepoprawnie. Do zmiennych służy blok environment." },
+            { key: "B", text: "Do warunkowego wykonywania etapów na podstawie określonych kryteriów", explanation: "Poprawnie! when pozwala uruchamiać etap tylko gdy spełnione są warunki, np. when { branch 'master' } - tylko dla gałęzi master." },
+            { key: "C", text: "Do określania czasu wykonania pipeline'u", explanation: "Niepoprawnie. Do harmonogramu służy triggers." },
+            { key: "D", text: "Do obsługi błędów", explanation: "Niepoprawnie. Do błędów służy post { failure { } } lub try-catch." }
+        ],
+        correctAnswer: "B",
+        topic: "Jenkins Pipeline"
+    },
+    {
+        id: 84,
+        question: "Co robi poniższy fragment Jenkinsfile?",
+        code: "post {\n    always {\n        echo 'Pipeline completed'\n    }\n    success {\n        mail to: 'team@example.com', subject: 'Build OK'\n    }\n    failure {\n        mail to: 'team@example.com', subject: 'Build FAILED'\n    }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Uruchamia pipeline trzy razy równolegle", explanation: "Niepoprawnie. post definiuje akcje po zakończeniu, nie równoległe wykonanie." },
+            { key: "B", text: "Wysyła email tylko przy sukcesie", explanation: "Niepoprawnie. Email jest wysyłany przy sukcesie LUB porażce, a 'Pipeline completed' zawsze." },
+            { key: "C", text: "Wykonuje różne akcje w zależności od wyniku: zawsze loguje, wysyła mail przy sukcesie lub porażce", explanation: "Poprawnie! Blok always wykonuje się zawsze, success tylko przy sukcesie, failure tylko przy porażce pipeline'u." },
+            { key: "D", text: "Definiuje trzy etapy pipeline'u", explanation: "Niepoprawnie. post to akcje po zakończeniu, nie etapy (stages)." }
+        ],
+        correctAnswer: "C",
+        topic: "Jenkins Pipeline"
+    },
+
+    // === Lesson 27: CI/CD - część 3 (Jenkins Agents) ===
+    {
+        id: 85,
+        question: "Co to jest agent Jenkins?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Węzeł (maszyna) wykonujący zadania kompilacji w izolowanym środowisku", explanation: "Poprawnie! Agenci odciążają kontroler Jenkins, wykonując buildy na osobnych maszynach, co zapewnia skalowalność i izolację." },
+            { key: "B", text: "Użytkownik z uprawnieniami administratora", explanation: "Niepoprawnie. Agent to maszyna/kontener, nie użytkownik." },
+            { key: "C", text: "Wtyczka do wysyłania powiadomień", explanation: "Niepoprawnie. Agent to infrastruktura wykonawcza, nie wtyczka." },
+            { key: "D", text: "Plik konfiguracyjny pipeline'u", explanation: "Niepoprawnie. To opisuje Jenkinsfile, nie agenta." }
+        ],
+        correctAnswer: "A",
+        topic: "Jenkins Agents"
+    },
+    {
+        id: 86,
+        question: "Jaka jest różnica między agentem stałym (permanent) a dynamicznym w Jenkins?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Agenci stali są szybsi, dynamiczni wolniejsi", explanation: "Niepoprawnie. Różnica dotyczy cyklu życia, nie wydajności." },
+            { key: "B", text: "Agent stały jest skonfigurowany na stałe; dynamiczny tworzy się na żądanie i usuwa po zadaniu", explanation: "Poprawnie! Dynamiczni agenci (np. kontenery Docker/Kubernetes) oszczędzają zasoby - powstają tylko gdy są potrzebni i znikają po zakończeniu pracy." },
+            { key: "C", text: "Agent stały wymaga Java, dynamiczny nie", explanation: "Niepoprawnie. Oba typy wymagają Java do komunikacji z kontrolerem." },
+            { key: "D", text: "Nie ma różnicy, to synonimy", explanation: "Niepoprawnie. To dwa różne modele zarządzania agentami." }
+        ],
+        correctAnswer: "B",
+        topic: "Jenkins Agents"
+    },
+    {
+        id: 87,
+        question: "Co robi poniższa konfiguracja w Jenkinsfile?",
+        code: "pipeline {\n    agent {\n        kubernetes {\n            yaml '''\n                spec:\n                  containers:\n                  - name: maven\n                    image: maven:3.8.6-openjdk-17\n            '''\n        }\n    }\n    stages {\n        stage('Build') {\n            steps {\n                container('maven') {\n                    sh 'mvn clean package'\n                }\n            }\n        }\n    }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Instaluje Maven na kontrolerze Jenkins", explanation: "Niepoprawnie. Maven jest w kontenerze, nie na kontrolerze." },
+            { key: "B", text: "Tworzy dynamiczny pod Kubernetes z kontenerem Maven i wykonuje w nim build", explanation: "Poprawnie! Pipeline używa agenta Kubernetes - tworzy pod z kontenerem maven:3.8.6-openjdk-17, wykonuje build i pod jest usuwany po zakończeniu." },
+            { key: "C", text: "Pobiera obraz Docker bez uruchamiania", explanation: "Niepoprawnie. Kontener jest uruchamiany i wykonuje polecenia." },
+            { key: "D", text: "Konfiguruje stałego agenta na serwerze", explanation: "Niepoprawnie. To dynamiczny agent Kubernetes, nie stały." }
+        ],
+        correctAnswer: "B",
+        topic: "Jenkins Agents"
+    },
+
+    // === Lesson 28: Technologie chmurowe AWS - Część 1 ===
+    {
+        id: 88,
+        question: "Co oznacza skrót IaaS w kontekście usług chmurowych AWS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Internet as a Service", explanation: "Niepoprawnie. IaaS nie odnosi się do Internetu jako usługi." },
+            { key: "B", text: "Infrastructure as a Service", explanation: "Poprawnie! IaaS oznacza Infrastructure as a Service - model gdzie dostawca udostępnia infrastrukturę (serwery, storage, sieci), a klient zarządza systemem operacyjnym i aplikacjami. Przykłady w AWS: EC2, VPC, EBS." },
+            { key: "C", text: "Integration as a Service", explanation: "Niepoprawnie. Integracja to osobna kategoria usług, nie IaaS." },
+            { key: "D", text: "Identity as a Service", explanation: "Niepoprawnie. Zarządzanie tożsamością to osobna kategoria (np. AWS IAM), nie IaaS." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS - Wprowadzenie"
+    },
+    {
+        id: 89,
+        question: "Jaka jest różnica między regionem AWS (Region) a strefą dostępności (Availability Zone)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Region to jedno centrum danych, AZ to grupa regionów", explanation: "Niepoprawnie. Jest odwrotnie - region zawiera wiele AZ." },
+            { key: "B", text: "Region to geograficzna lokalizacja zawierająca minimum 3 AZ; AZ to fizycznie oddzielone centrum danych w regionie", explanation: "Poprawnie! Region (np. eu-central-1 Frankfurt) to obszar geograficzny. Każdy region ma minimum 3 strefy dostępności (np. eu-central-1a, eu-central-1b, eu-central-1c), które są oddzielnymi centrami danych z redundantnym zasilaniem i siecią." },
+            { key: "C", text: "Region i AZ to synonimy tego samego pojęcia", explanation: "Niepoprawnie. To dwa różne poziomy infrastruktury AWS." },
+            { key: "D", text: "AZ służy tylko do backupów, region do produkcji", explanation: "Niepoprawnie. Obie struktury służą do uruchamiania zasobów produkcyjnych." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS - Infrastruktura globalna"
+    },
+    {
+        id: 90,
+        question: "Co robi poniższe polecenie AWS CLI?",
+        code: "aws s3 sync /path/to/local/folder s3://my-bucket/folder/ --delete",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Pobiera pliki z S3 do lokalnego folderu", explanation: "Niepoprawnie. Kierunek jest odwrotny - z lokalnego do S3 (źródło jest pierwsze)." },
+            { key: "B", text: "Synchronizuje folder lokalny do S3, usuwając pliki z S3 których nie ma lokalnie", explanation: "Poprawnie! Polecenie sync kopiuje nowe i zmienione pliki z lokalnego folderu do S3. Flaga --delete powoduje usunięcie plików z S3, które nie istnieją lokalnie - tworząc dokładne lustrzane odbicie (mirror)." },
+            { key: "C", text: "Usuwa wszystkie pliki z bucketu S3", explanation: "Niepoprawnie. Polecenie sync nie usuwa wszystkiego - tylko pliki których nie ma w źródle. Do usunięcia wszystkiego służy aws s3 rm --recursive." },
+            { key: "D", text: "Tworzy nowy bucket o nazwie my-bucket", explanation: "Niepoprawnie. Do tworzenia bucketu służy aws s3 mb. Polecenie sync zakłada, że bucket już istnieje." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS CLI"
+    },
+
+
+    // === Lesson 29: AWS - EC2, EBS, RDS i S3 ===
+    {
+        id: 91,
+        question: "Który typ instancji EC2 jest objęty AWS Free Tier i nadaje się do lekkich obciążeń?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "m5.large", explanation: "Niepoprawnie. m5.large ma 2 vCPU i 8 GiB RAM - to instancja ogólnego przeznaczenia, nie objęta Free Tier." },
+            { key: "B", text: "t2.micro", explanation: "Poprawnie! t2.micro (1 vCPU, 1 GiB RAM) jest objęty AWS Free Tier - 750 godzin miesięcznie przez pierwszy rok. Idealny do nauki i lekkich workloadów." },
+            { key: "C", text: "c5.xlarge", explanation: "Niepoprawnie. c5.xlarge to instancja zoptymalizowana pod obliczenia (Compute Optimized), nie objęta Free Tier." },
+            { key: "D", text: "p3.2xlarge", explanation: "Niepoprawnie. p3.2xlarge to droga instancja z GPU Tesla V100 dla ML/AI, zdecydowanie nie objęta Free Tier." }
+        ],
+        correctAnswer: "B",
+        topic: "Amazon EC2"
+    },
+    {
+        id: 92,
+        question: "Jaka jest różnica między woluminem EBS typu gp3 a gp2?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "gp3 umożliwia niezależne skalowanie IOPS i throughput; gp2 skaluje IOPS proporcjonalnie do rozmiaru", explanation: "Poprawnie! W gp3 można niezależnie ustawić IOPS (do 16000) i throughput (do 1000 MiB/s). W gp2 IOPS są powiązane z rozmiarem (3 IOPS per GiB). gp3 jest nowszy i zazwyczaj tańszy." },
+            { key: "B", text: "gp2 jest szybszy od gp3", explanation: "Niepoprawnie. gp3 oferuje wyższą wydajność przy niższym koszcie - jest nowszą generacją." },
+            { key: "C", text: "gp3 jest przeznaczony tylko dla archiwizacji", explanation: "Niepoprawnie. gp3 to dysk SSD ogólnego przeznaczenia do aktywnych workloadów, nie archiwizacji (do tego służy Glacier)." },
+            { key: "D", text: "gp2 obsługuje szyfrowanie, gp3 nie", explanation: "Niepoprawnie. Oba typy obsługują szyfrowanie EBS (at-rest i in-transit)." }
+        ],
+        correctAnswer: "A",
+        topic: "Amazon EBS"
+    },
+    {
+        id: 93,
+        question: "Co robi poniższe polecenie AWS CLI?",
+        code: "aws rds create-db-instance-read-replica \\\n    --db-instance-identifier myapp-mysql-read-replica \\\n    --source-db-instance-identifier myapp-mysql-prod \\\n    --db-instance-class db.t3.medium \\\n    --publicly-accessible",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tworzy backup bazy danych do S3", explanation: "Niepoprawnie. Do backupów służy create-db-snapshot. To polecenie tworzy replikę." },
+            { key: "B", text: "Tworzy asynchroniczną replikę do odczytu bazy myapp-mysql-prod z publicznym dostępem", explanation: "Poprawnie! Read Replica to kopia bazy z asynchroniczną replikacją, służąca do odciążenia odczytów. Flaga --publicly-accessible umożliwia dostęp spoza VPC. Replika ma własną instancję db.t3.medium." },
+            { key: "C", text: "Włącza Multi-AZ dla istniejącej bazy", explanation: "Niepoprawnie. Multi-AZ to synchroniczna replika dla failover, nie read replica. Do Multi-AZ służy modify-db-instance z --multi-az." },
+            { key: "D", text: "Migruje bazę do innego regionu AWS", explanation: "Niepoprawnie. To tworzy replikę w tym samym regionie. Cross-region replica wymaga dodatkowego parametru --region." }
+        ],
+        correctAnswer: "B",
+        topic: "Amazon RDS"
+    },
+
+
+    // === Lesson 29: AWS - VPC, ELB, Auto Scaling, Route 53 ===
+    {
+        id: 94,
+        question: "Jaka jest główna różnica między Security Groups a Network ACLs w AWS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Security Groups są stateful i działają na poziomie instancji; NACLs są stateless i działają na poziomie podsieci", explanation: "Poprawnie! Security Groups automatycznie zezwalają na ruch powrotny (stateful). NACLs wymagają osobnych reguł dla ruchu wchodzącego i wychodzącego (stateless). SG działają na instancji, NACL na całej podsieci." },
+            { key: "B", text: "Security Groups pozwalają na reguły Deny, NACLs tylko Allow", explanation: "Niepoprawnie. Jest odwrotnie - Security Groups mają tylko reguły Allow, NACLs mają Allow i Deny." },
+            { key: "C", text: "NACLs są płatne, Security Groups są darmowe", explanation: "Niepoprawnie. Oba mechanizmy są darmowe - to wbudowane funkcje VPC." },
+            { key: "D", text: "Nie ma różnicy - to synonimy tego samego mechanizmu", explanation: "Niepoprawnie. To dwa różne mechanizmy firewall na różnych poziomach architektury." }
+        ],
+        correctAnswer: "A",
+        topic: "AWS VPC - Security"
+    },
+    {
+        id: 95,
+        question: "Do czego służy NAT Gateway w architekturze VPC?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Umożliwia ruch internetowy do instancji w public subnets", explanation: "Niepoprawnie. Do tego służy Internet Gateway. NAT Gateway służy private subnetom." },
+            { key: "B", text: "Pozwala instancjom w private subnets inicjować połączenia wychodzące do internetu bez możliwości połączeń przychodzących", explanation: "Poprawnie! NAT Gateway tłumaczy adresy prywatne na publiczne dla ruchu wychodzącego. Instancje w private subnets mogą pobierać aktualizacje, ale nie są dostępne z internetu." },
+            { key: "C", text: "Szyfruje cały ruch sieciowy w VPC", explanation: "Niepoprawnie. Do szyfrowania służą inne mechanizmy (TLS, VPN). NAT Gateway obsługuje translację adresów." },
+            { key: "D", text: "Łączy dwa VPC ze sobą", explanation: "Niepoprawnie. Do łączenia VPC służy VPC Peering lub Transit Gateway, nie NAT Gateway." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS VPC - Networking"
+    },
+    {
+        id: 96,
+        question: "Co robi poniższa konfiguracja Auto Scaling?",
+        code: "aws autoscaling put-scaling-policy \\\n  --policy-type TargetTrackingScaling \\\n  --target-tracking-configuration '{\n    \"PredefinedMetricSpecification\": {\n      \"PredefinedMetricType\": \"ASGAverageCPUUtilization\"\n    },\n    \"TargetValue\": 50.0\n  }'",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Ustawia maksymalną liczbę instancji na 50", explanation: "Niepoprawnie. TargetValue 50.0 odnosi się do procentu CPU, nie liczby instancji." },
+            { key: "B", text: "Automatycznie skaluje liczbę instancji, aby utrzymać średnie zużycie CPU na poziomie 50%", explanation: "Poprawnie! Target Tracking Policy automatycznie dodaje instancje gdy CPU > 50% i usuwa gdy CPU < 50%, dążąc do utrzymania docelowej wartości." },
+            { key: "C", text: "Wysyła alert gdy CPU przekroczy 50%", explanation: "Niepoprawnie. To nie jest alarm CloudWatch - to polityka skalowania, która aktywnie zmienia liczbę instancji." },
+            { key: "D", text: "Zatrzymuje wszystkie instancje gdy CPU spadnie poniżej 50%", explanation: "Niepoprawnie. Polityka zmniejsza liczbę instancji, ale zachowuje minimum zdefiniowane w ASG (min-size)." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS Auto Scaling"
+    },
+
+    // === Lesson 30: AWS Lambda, ECS, Fargate ===
+    {
+        id: 97,
+        question: "Co oznacza model 'serverless' w kontekście AWS Lambda?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Aplikacja działa bez żadnych serwerów", explanation: "Niepoprawnie. Serwery istnieją, ale są zarządzane przez AWS - użytkownik nie musi się nimi zajmować." },
+            { key: "B", text: "AWS zarządza infrastrukturą; użytkownik płaci tylko za czas wykonania kodu", explanation: "Poprawnie! W modelu serverless nie zarządzasz serwerami, OS, skalowaniem. Lambda automatycznie skaluje się od 0 do tysięcy wywołań, a opłaty są naliczane co 1ms czasu wykonania." },
+            { key: "C", text: "Kod działa wyłącznie w przeglądarce użytkownika", explanation: "Niepoprawnie. Lambda to server-side compute, kod wykonuje się w chmurze AWS." },
+            { key: "D", text: "Aplikacja wymaga minimum 10 serwerów do działania", explanation: "Niepoprawnie. Lambda może działać bez żadnych zarezerwowanych zasobów (skaluje się od zera)." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS Lambda"
+    },
+    {
+        id: 98,
+        question: "Jaka jest główna różnica między ECS na EC2 a AWS Fargate?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Fargate jest szybszy od EC2", explanation: "Niepoprawnie. Różnica dotyczy modelu zarządzania, nie wydajności." },
+            { key: "B", text: "W EC2 zarządzasz instancjami i klastrem; w Fargate AWS zarządza infrastrukturą - płacisz za vCPU i RAM zadania", explanation: "Poprawnie! W ECS/EC2 musisz skalować zarówno kontenery jak i klaster EC2. Fargate to serverless dla kontenerów - definiujesz tylko zasoby dla Task, bez zarządzania serwerami." },
+            { key: "C", text: "EC2 obsługuje Docker, Fargate tylko własne formaty", explanation: "Niepoprawnie. Oba używają obrazów Docker i tych samych Task Definitions." },
+            { key: "D", text: "Fargate jest dostępny tylko w regionie us-east-1", explanation: "Niepoprawnie. Fargate jest dostępny globalnie w większości regionów AWS." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS ECS i Fargate"
+    },
+    {
+        id: 99,
+        question: "Co definiuje poniższy fragment Task Definition dla ECS?",
+        code: "{\n  \"family\": \"web-server-task\",\n  \"networkMode\": \"awsvpc\",\n  \"containerDefinitions\": [{\n    \"name\": \"web-app\",\n    \"image\": \"123456789012.dkr.ecr.eu-central-1.amazonaws.com/my-web-app:v1\",\n    \"cpu\": 256,\n    \"memory\": 512,\n    \"portMappings\": [{ \"containerPort\": 80 }]\n  }],\n  \"requiresCompatibilities\": [\"FARGATE\"]\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Konfigurację bazy danych RDS", explanation: "Niepoprawnie. To Task Definition dla kontenerów ECS, nie konfiguracja bazy danych." },
+            { key: "B", text: "Definicję zadania Fargate: kontener z obrazem ECR, 256 CPU units, 512 MB RAM, port 80", explanation: "Poprawnie! Task Definition określa: obraz Docker z ECR, zasoby (cpu: 256 units = 0.25 vCPU, memory: 512 MB), mapowanie portu 80, tryb sieci awsvpc wymagany dla Fargate." },
+            { key: "C", text: "Skrypt do instalacji aplikacji na EC2", explanation: "Niepoprawnie. To JSON definiujący kontener, nie skrypt instalacyjny." },
+            { key: "D", text: "Politykę IAM dla użytkownika", explanation: "Niepoprawnie. To Task Definition ECS, nie IAM Policy." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS ECS Task Definition"
+    },
+
+    // === Lesson 30: AWS SQS, SNS, CloudFront, Boto3 ===
+    {
+        id: 100,
+        question: "Jaka jest różnica między kolejką Standard a FIFO w Amazon SQS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Standard ma nieograniczoną przepustowość i best-effort ordering; FIFO gwarantuje kolejność i exactly-once processing", explanation: "Poprawnie! Standard Queue obsługuje praktycznie nieograniczoną liczbę wiadomości, ale może dostarczyć je w innej kolejności. FIFO (max 3000 msg/s) gwarantuje kolejność i że każda wiadomość jest przetworzona dokładnie raz." },
+            { key: "B", text: "Standard jest darmowy, FIFO jest płatny", explanation: "Niepoprawnie. Obie opcje są płatne, FIFO jest nieco droższy za wiadomość." },
+            { key: "C", text: "Standard obsługuje tylko tekst, FIFO obsługuje binarki", explanation: "Niepoprawnie. Obie kolejki obsługują wiadomości do 256 KB w dowolnym formacie." },
+            { key: "D", text: "FIFO jest szybszy od Standard", explanation: "Niepoprawnie. Standard ma wyższą przepustowość; FIFO ma limit ~3000 msg/s ale gwarantuje kolejność." }
+        ],
+        correctAnswer: "A",
+        topic: "Amazon SQS"
+    },
+    {
+        id: 101,
+        question: "Na czym polega wzorzec Fanout z użyciem SNS i SQS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Jedna wiadomość SNS jest dostarczana do wielu kolejek SQS równocześnie przez subskrypcje", explanation: "Poprawnie! Fanout: publikujesz jedną wiadomość do topiku SNS, a SNS automatycznie wysyła kopie do wszystkich zasubskrybowanych kolejek SQS. Każda kolejka przetwarza wiadomość niezależnie (np. email, analytics, archiwum)." },
+            { key: "B", text: "Wiadomości z wielu kolejek SQS są agregowane w jeden topik SNS", explanation: "Niepoprawnie. Jest odwrotnie - SNS rozgłasza do SQS, nie agreguje." },
+            { key: "C", text: "SNS zastępuje SQS w architekturze", explanation: "Niepoprawnie. SNS i SQS to komplementarne usługi używane razem w wzorcu Fanout." },
+            { key: "D", text: "SQS wysyła powiadomienia email przez SNS", explanation: "Niepoprawnie. To SNS wysyła do SQS i innych subskrybentów, nie odwrotnie." }
+        ],
+        correctAnswer: "A",
+        topic: "AWS SNS + SQS"
+    },
+    {
+        id: 102,
+        question: "Co robi poniższy kod Boto3?",
+        code: "s3_client = boto3.client('s3')\nurl = s3_client.generate_presigned_url(\n    'get_object',\n    Params={'Bucket': 'my-bucket', 'Key': 'secret.pdf'},\n    ExpiresIn=3600\n)",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Usuwa plik secret.pdf z bucketu", explanation: "Niepoprawnie. generate_presigned_url nie modyfikuje obiektów - tylko generuje URL." },
+            { key: "B", text: "Generuje tymczasowy URL umożliwiający pobranie pliku bez uwierzytelnienia przez 1 godzinę", explanation: "Poprawnie! Presigned URL pozwala na dostęp do prywatnego obiektu S3 bez credentials AWS. ExpiresIn=3600 oznacza ważność 3600 sekund (1 godzina). Idealny do udostępniania plików zewnętrznym użytkownikom." },
+            { key: "C", text: "Szyfruje plik secret.pdf", explanation: "Niepoprawnie. Ta funkcja generuje URL, nie szyfruje obiektów. Do szyfrowania służą inne mechanizmy (SSE-S3, SSE-KMS)." },
+            { key: "D", text: "Tworzy publiczny bucket z plikiem", explanation: "Niepoprawnie. Presigned URL nie zmienia uprawnień bucketu - daje tymczasowy dostęp do konkretnego obiektu." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS Boto3 - S3"
+    },
+
+
+    // === Lesson 31: AWS IAM, CLI, Boto3 ===
+    {
+        id: 103,
+        question: "Które komponenty IAM są używane do zarządzania dostępem do zasobów AWS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Users, Groups, Roles, Policies", explanation: "Poprawnie! Users to konta dla osób/aplikacji, Groups grupują użytkowników, Roles to tymczasowe uprawnienia dla usług, Policies to dokumenty JSON definiujące uprawnienia." },
+            { key: "B", text: "EC2, S3, RDS, Lambda", explanation: "Niepoprawnie. To są usługi AWS (compute, storage, database, serverless), nie komponenty IAM." },
+            { key: "C", text: "VPC, Subnet, Security Group, NACL", explanation: "Niepoprawnie. To komponenty sieciowe VPC, nie IAM." },
+            { key: "D", text: "CloudWatch, CloudTrail, Config, GuardDuty", explanation: "Niepoprawnie. To usługi monitoringu i bezpieczeństwa, nie komponenty IAM." }
+        ],
+        correctAnswer: "A",
+        topic: "AWS IAM - Podstawy"
+    },
+    {
+        id: 104,
+        question: "Kiedy należy użyć IAM Role zamiast IAM User?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Gdy osoba potrzebuje dostępu do konsoli AWS", explanation: "Niepoprawnie. Dostęp do konsoli to typowe użycie IAM User z hasłem." },
+            { key: "B", text: "Gdy usługa AWS (np. EC2, Lambda) potrzebuje dostępu do innych usług", explanation: "Poprawnie! Role zapewniają tymczasowe credentials dla usług AWS. EC2 z Instance Profile może automatycznie pobierać tokeny. Nie przechowuje się długoterminowych kluczy na instancjach." },
+            { key: "C", text: "Gdy potrzebna jest stała konfiguracja uprawnień", explanation: "Niepoprawnie. Role dają tymczasowe credentials, które są rotowane automatycznie." },
+            { key: "D", text: "Zawsze - Role są lepsze od Users", explanation: "Niepoprawnie. Users są właściwe dla osób potrzebujących stałego dostępu do konsoli/CLI." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS IAM - Roles"
+    },
+    {
+        id: 105,
+        question: "Co oznacza poniższa IAM Policy?",
+        code: "{\n  \"Effect\": \"Allow\",\n  \"Action\": [\"ec2:StartInstances\", \"ec2:StopInstances\"],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"StringEquals\": {\n      \"ec2:ResourceTag/Environment\": \"Development\"\n    }\n  }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Pozwala na uruchamianie i zatrzymywanie wszystkich instancji EC2", explanation: "Niepoprawnie. Condition ogranicza dostęp tylko do instancji z określonym tagiem." },
+            { key: "B", text: "Pozwala na uruchamianie i zatrzymywanie tylko instancji EC2 oznaczonych tagiem Environment=Development", explanation: "Poprawnie! Condition StringEquals ogranicza akcje do zasobów z tagiem Environment o wartości Development. To przykład zasady najmniejszych uprawnień." },
+            { key: "C", text: "Blokuje dostęp do środowiska Development", explanation: "Niepoprawnie. Effect jest Allow, nie Deny - więc policy zezwala na akcje." },
+            { key: "D", text: "Tworzy nowe instancje EC2 w środowisku Development", explanation: "Niepoprawnie. Akcje to Start/Stop, nie RunInstances (tworzenie)." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS IAM - Policies"
+    },
+
+    // === Lesson 31: AWS Security, CloudWatch ===
+    {
+        id: 106,
+        question: "Do czego służy Amazon CloudWatch?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Monitoringu zasobów AWS, zbierania metryk, logów i tworzenia alarmów", explanation: "Poprawnie! CloudWatch to usługa observability: metryki (CPU, pamięć), logi (aplikacji, systemowe), alarmy (powiadomienia przy przekroczeniu progów), dashboardy." },
+            { key: "B", text: "Zarządzania tożsamością i dostępem", explanation: "Niepoprawnie. To rola IAM (Identity and Access Management)." },
+            { key: "C", text: "Przechowywania plików w chmurze", explanation: "Niepoprawnie. Do storage służy S3, EBS, EFS." },
+            { key: "D", text: "Uruchamiania kontenerów Docker", explanation: "Niepoprawnie. Do kontenerów służy ECS/EKS/Fargate." }
+        ],
+        correctAnswer: "A",
+        topic: "Amazon CloudWatch"
+    },
+    {
+        id: 107,
+        question: "Jak skonfigurować bezpieczny cross-account access między kontami AWS?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Udostępnić Access Key ID i Secret Access Key między kontami", explanation: "Niepoprawnie. Współdzielenie długoterminowych kluczy to poważne ryzyko bezpieczeństwa - credentials mogą wyciec." },
+            { key: "B", text: "Utworzyć IAM Role z trust policy zezwalającą na AssumeRole z drugiego konta, opcjonalnie z External ID", explanation: "Poprawnie! Role z trust policy to bezpieczny sposób - konto A zakłada rolę w koncie B, otrzymując tymczasowe credentials. External ID chroni przed 'confused deputy problem'." },
+            { key: "C", text: "Utworzyć tego samego użytkownika IAM w obu kontach", explanation: "Niepoprawnie. Użytkownicy są lokalni dla konta - nie można ich współdzielić między kontami." },
+            { key: "D", text: "Połączyć konta przez VPC Peering", explanation: "Niepoprawnie. VPC Peering łączy sieci, nie zarządza uprawnieniami IAM." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS IAM - Cross-Account"
+    },
+    {
+        id: 108,
+        question: "Co robi poniższy fragment IAM Policy?",
+        code: "{\n  \"Effect\": \"Deny\",\n  \"NotAction\": [\n    \"iam:CreateVirtualMFADevice\",\n    \"iam:EnableMFADevice\",\n    \"iam:GetUser\"\n  ],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"BoolIfExists\": {\n      \"aws:MultiFactorAuthPresent\": \"false\"\n    }\n  }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Blokuje wszystkie akcje dla użytkowników z MFA", explanation: "Niepoprawnie. Condition sprawdza MFA=false, więc blokuje użytkowników BEZ MFA." },
+            { key: "B", text: "Blokuje większość akcji dla użytkowników bez MFA, pozwalając tylko na konfigurację MFA", explanation: "Poprawnie! NotAction + Deny oznacza: blokuj wszystko OPRÓCZ wymienionych akcji. Użytkownicy bez MFA mogą tylko skonfigurować swoje MFA. Po włączeniu MFA mają pełny dostęp." },
+            { key: "C", text: "Wymusza MFA tylko dla administratorów", explanation: "Niepoprawnie. Resource: '*' oznacza, że dotyczy wszystkich zasobów i użytkowników z tą policy." },
+            { key: "D", text: "Wyłącza MFA dla wszystkich użytkowników", explanation: "Niepoprawnie. Policy wymusza MFA, nie wyłącza go." }
+        ],
+        correctAnswer: "B",
+        topic: "AWS IAM - MFA Policy"
+    },
+
+    // === Lesson 32: Infrastructure as Code, Terraform ===
+    {
+        id: 109,
+        question: "Co oznacza podejście Infrastructure as Code (IaC)?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Programowanie aplikacji w językach niskiego poziomu", explanation: "Niepoprawnie. IaC dotyczy infrastruktury (serwery, sieci), nie programowania aplikacji." },
+            { key: "B", text: "Definiowanie, wdrażanie i zarządzanie infrastrukturą za pomocą kodu zamiast ręcznej konfiguracji", explanation: "Poprawnie! IaC pozwala opisać infrastrukturę w plikach konfiguracyjnych, zapewniając: wersjonowanie (git), powtarzalność, automatyzację i eliminację błędów ludzkich." },
+            { key: "C", text: "Ręczne klikanie w konsoli AWS", explanation: "Niepoprawnie. To jest przeciwieństwo IaC - ręczna konfiguracja jest podatna na błędy i niepowtarzalna." },
+            { key: "D", text: "Używanie wyłącznie serwerów fizycznych", explanation: "Niepoprawnie. IaC jest szczególnie popularne w chmurze, ale może też zarządzać infrastrukturą on-premises." }
+        ],
+        correctAnswer: "B",
+        topic: "Infrastructure as Code"
+    },
+    {
+        id: 110,
+        question: "Jaka jest różnica między podejściem deklaratywnym a imperatywnym w IaC?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Deklaratywne opisuje 'co' chcesz osiągnąć; imperatywne opisuje 'jak' to osiągnąć krok po kroku", explanation: "Poprawnie! Terraform (deklaratywny): opisujesz końcowy stan, narzędzie planuje wykonanie. Skrypt bash (imperatywny): piszesz sekwencję poleceń do wykonania. Deklaratywne jest łatwiejsze do utrzymania." },
+            { key: "B", text: "Deklaratywne jest wolniejsze, imperatywne szybsze", explanation: "Niepoprawnie. Różnica dotyczy sposobu opisu, nie wydajności wykonania." },
+            { key: "C", text: "Imperatywne wymaga chmury, deklaratywne działa lokalnie", explanation: "Niepoprawnie. Oba podejścia mogą działać z chmurą i lokalnie." },
+            { key: "D", text: "Nie ma różnicy - to synonimy", explanation: "Niepoprawnie. To fundamentalnie różne podejścia do definiowania infrastruktury." }
+        ],
+        correctAnswer: "A",
+        topic: "IaC - Podejścia"
+    },
+    {
+        id: 111,
+        question: "Co robi poniższy kod Terraform?",
+        code: "resource \"aws_instance\" \"web\" {\n  ami           = var.ami_id\n  instance_type = var.environment == \"production\" ? \"t3.large\" : \"t3.micro\"\n  count         = 3\n\n  tags = {\n    Name = \"WebServer-${count.index + 1}\"\n  }\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tworzy jedną instancję EC2 o nazwie WebServer", explanation: "Niepoprawnie. count = 3 oznacza utworzenie trzech instancji." },
+            { key: "B", text: "Tworzy 3 instancje EC2; typ zależy od środowiska (t3.large dla production, t3.micro dla innych); nazwy WebServer-1, WebServer-2, WebServer-3", explanation: "Poprawnie! count=3 tworzy 3 instancje. Conditional expression (?:) wybiera typ na podstawie zmiennej environment. count.index (0,1,2) + 1 daje numery 1,2,3 w nazwach." },
+            { key: "C", text: "Usuwa 3 istniejące instancje", explanation: "Niepoprawnie. resource block tworzy zasoby, nie usuwa. Usunięcie wymaga usunięcia bloku i wykonania terraform apply." },
+            { key: "D", text: "Wyświetla listę dostępnych typów instancji", explanation: "Niepoprawnie. To definicja zasobu, nie query. Do wyświetlania służy data source lub output." }
+        ],
+        correctAnswer: "B",
+        topic: "Terraform - HCL"
+    },
+
+
+    // === Lesson 33: Infrastructure as Code, Terraform - Część 2 ===
+    {
+        id: 112,
+        question: "Do czego służy polecenie 'terraform import'?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Do pobierania modułów z Terraform Registry", explanation: "Niepoprawnie. Moduły pobiera się przez terraform init lub deklarację source w bloku module." },
+            { key: "B", text: "Do włączenia istniejących zasobów (utworzonych ręcznie lub innymi narzędziami) pod zarządzanie Terraform", explanation: "Poprawnie! terraform import pozwala 'zaimportować' istniejącą infrastrukturę do stanu Terraform. Ważne: polecenie NIE generuje konfiguracji - musisz ręcznie napisać odpowiedni blok resource." },
+            { key: "C", text: "Do kopiowania zmiennych między workspace'ami", explanation: "Niepoprawnie. Workspace'y nie mają wbudowanego mechanizmu importu zmiennych." },
+            { key: "D", text: "Do importowania sekretów z AWS Secrets Manager", explanation: "Niepoprawnie. Do sekretów używa się data source 'aws_secretsmanager_secret_version'." }
+        ],
+        correctAnswer: "B",
+        topic: "Terraform - Import"
+    },
+    {
+        id: 113,
+        question: "Dlaczego warto używać remote state (np. S3 + DynamoDB) zamiast lokalnego pliku terraform.tfstate?",
+        code: null,
+        type: "multiple",
+        options: [
+            { key: "A", text: "Remote state jest szybszy niż lokalny plik", explanation: "Niepoprawnie. Remote state może być nawet wolniejszy przez sieć, ale korzyści dotyczą współpracy i bezpieczeństwa." },
+            { key: "B", text: "Umożliwia współpracę zespołową, blokowanie (locking) przed równoczesnymi zmianami i bezpieczne przechowywanie", explanation: "Poprawnie! Remote state rozwiązuje: 1) Współpracę - cały zespół widzi aktualny stan. 2) State locking (DynamoDB) - zapobiega konfliktom przy równoczesnym terraform apply. 3) Backup i szyfrowanie (S3 encrypt=true)." },
+            { key: "C", text: "Terraform wymaga remote state w wersji 1.0+", explanation: "Niepoprawnie. Terraform nadal obsługuje lokalny state, remote jest rekomendowany, ale opcjonalny." },
+            { key: "D", text: "Lokalny state nie obsługuje providerów AWS", explanation: "Niepoprawnie. Lokalny state działa ze wszystkimi providerami." }
+        ],
+        correctAnswer: "B",
+        topic: "Terraform - Remote State"
+    },
+    {
+        id: 114,
+        question: "Co robi poniższy kod Terraform?",
+        code: "module \"web_server\" {\n  source = \"./modules/docker-app\"\n  \n  image_name     = \"nginx:latest\"\n  container_name = \"prod-nginx\"\n  external_port  = 8080\n  environment    = \"prod\"\n}\n\noutput \"web_url\" {\n  value = module.web_server.external_url\n}",
+        type: "multiple",
+        options: [
+            { key: "A", text: "Tworzy obraz Docker o nazwie nginx:latest", explanation: "Niepoprawnie. image_name to parametr przekazywany do modułu, który wewnętrznie może tworzyć obraz, ale sam blok module nie tworzy obrazu bezpośrednio." },
+            { key: "B", text: "Wywołuje lokalny moduł 'docker-app' z parametrami; moduł tworzy kontener; output pobiera URL z modułu", explanation: "Poprawnie! source wskazuje lokalizację modułu. Parametry (image_name, container_name, etc.) to zmienne zdefiniowane w module. output pobiera wartość z outputs.tf modułu przez module.nazwa_modułu.nazwa_outputu." },
+            { key: "C", text: "Pobiera moduł z Terraform Registry i instaluje Nginx", explanation: "Niepoprawnie. source='./modules/docker-app' to ścieżka lokalna, nie Registry. Registry używa formatu source='hashicorp/consul/aws'." },
+            { key: "D", text: "Definiuje zmienne dla środowiska production", explanation: "Niepoprawnie. To wywołanie modułu z konkretnymi wartościami, nie definicja zmiennych. Definicje używają bloku 'variable'." }
+        ],
+        correctAnswer: "B",
+        topic: "Terraform - Moduły"
+    },
+];
+
+
+
+        // ==========================================
+        // QUIZ DATA - Replace this with your content
+        // ==========================================
+        const quizData = {
+            meta: {
+                title: "DevOps Online Quiz",
+                description: "Quiz sprawdzający wiedzę z całego kursu DevOps Online",
+                course: "DevOps Online",
+                lessonNumber: "01-44",
+                author: "LearnIT",
+                resultsWebhookUrl: "https://automations.learnit.com.pl/webhook-test/0d3a2fde-a6cf-44aa-a522-6745dfbb3eb6"
+            },
+            questions: bookQuestions,
+            settings: {
+                shuffleQuestions: false,
+                showExplanationsAfterEach: false,
+                passingScore: 70
+            }
+        };
+
+        // ==========================================
+        // QUIZ LOGIC (DO NOT MODIFY)
+        // ==========================================
+
+        let currentQuestionIndex = 0;
+        let selectedAnswer = null;
+        let userAnswers = [];
+        let quizFinished = false;
+        let userEmail = '';
+        let continueFromSaved = false;
+
+        // ==========================================
+        // LOCAL STORAGE FUNCTIONS
+        // ==========================================
+
+        function getQuizStorageKey() {
+            // Create unique key based on quiz title (sanitized)
+            const sanitized = quizData.meta.title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            return `quiz_progress_${sanitized}`;
+        }
+
+        function saveProgress() {
+            const progressData = {
+                email: userEmail,
+                answers: userAnswers.map(a => {
+                    // Convert option key (A,B,C,D) to index (0,1,2,3) for compact storage
+                    if (a === null) return null;
+                    return a.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                }),
+                currentIndex: currentQuestionIndex,
+                timestamp: Date.now()
+            };
+            try {
+                localStorage.setItem(getQuizStorageKey(), JSON.stringify(progressData));
+            } catch (e) {
+                console.warn('Could not save progress to localStorage:', e);
+            }
+        }
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem(getQuizStorageKey());
+                if (!saved) return null;
+                const data = JSON.parse(saved);
+                // Convert indices back to keys
+                data.answers = data.answers.map(a => {
+                    if (a === null) return null;
+                    return String.fromCharCode(65 + a); // 0=A, 1=B, 2=C, 3=D
+                });
+                return data;
+            } catch (e) {
+                console.warn('Could not load progress from localStorage:', e);
+                return null;
+            }
+        }
+
+        function clearProgress() {
+            try {
+                localStorage.removeItem(getQuizStorageKey());
+            } catch (e) {
+                console.warn('Could not clear progress from localStorage:', e);
+            }
+        }
+
+        function hasStoredProgress() {
+            const progress = loadProgress();
+            if (!progress) return false;
+            // Check if progress is valid (has answers and not too old - 7 days)
+            const weekInMs = 7 * 24 * 60 * 60 * 1000;
+            if (Date.now() - progress.timestamp > weekInMs) {
+                clearProgress();
+                return false;
+            }
+            // Check if any questions were answered
+            return progress.answers.some(a => a !== null);
+        }
+
+        // ==========================================
+        // URL PARAMETERS
+        // ==========================================
+
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function getEmailFromUrl() {
+            const email = getUrlParameter('email');
+            if (email && isValidEmail(email)) {
+                return email;
+            }
+            return null;
+        }
+
+        // ==========================================
+        // FULLSCREEN
+        // ==========================================
+
+        function toggleFullscreen() {
+            const doc = document.documentElement;
+
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                // Enter fullscreen
+                if (doc.requestFullscreen) {
+                    doc.requestFullscreen();
+                } else if (doc.webkitRequestFullscreen) {
+                    doc.webkitRequestFullscreen(); // Safari
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen(); // Safari
+                }
+            }
+        }
+
+        function updateFullscreenButton() {
+            const icon = document.getElementById('fullscreenIcon');
+            const text = document.getElementById('fullscreenText');
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+
+            if (isFullscreen) {
+                icon.innerHTML = '&#x2716;'; // X icon
+                text.textContent = 'Zamknij';
+            } else {
+                icon.innerHTML = '&#x26F6;'; // Expand icon
+                text.textContent = 'Pełny ekran';
+            }
+        }
+
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+
+        // ==========================================
+        // RESULTS SUBMISSION
+        // ==========================================
+
+        async function submitResults() {
+            const webhookUrl = quizData.meta.resultsWebhookUrl;
+            if (!webhookUrl) return; // Не отправляем если URL не указан
+
+            // Подсчёт результатов
+            let correctCount = 0;
+            const userAnswersList = [];
+            const correctAnswersList = [];
+
+            quizData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index] || '-';
+                userAnswersList.push(userAnswer);
+                correctAnswersList.push(q.correctAnswer);
+                if (userAnswer === q.correctAnswer) correctCount++;
+            });
+
+            const totalQuestions = quizData.questions.length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            const payload = {
+                quiz_title: quizData.meta.title,
+                quiz_course: quizData.meta.course || '',
+                email: userEmail,
+                score_percent: percentage,
+                score_correct: correctCount,
+                score_total: totalQuestions,
+                passed: percentage >= quizData.settings.passingScore,
+                answers: userAnswersList.join(','),
+                correct_answers: correctAnswersList.join(','),
+                submitted_at: new Date().toISOString()
+            };
+
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.warn('Could not submit results:', e);
+            }
+        }
+
+        function getProgressSummary() {
+            const progress = loadProgress();
+            if (!progress) return null;
+            const answeredCount = progress.answers.filter(a => a !== null).length;
+            return {
+                email: progress.email,
+                answered: answeredCount,
+                total: quizData.questions.length,
+                currentIndex: progress.currentIndex
+            };
+        }
+
+        // Initialize start screen
+        function initStartScreen() {
+            // Set page title
+            document.title = `Quiz: ${quizData.meta.title} | LearnIT`;
+            document.getElementById('headerTitle').textContent = quizData.meta.title;
+
+            // Populate start screen
+            document.getElementById('startTitle').textContent = quizData.meta.title;
+            document.getElementById('startDescription').textContent = quizData.meta.description;
+            document.getElementById('questionCount').textContent = quizData.questions.length;
+            document.getElementById('passingScoreDisplay').textContent = quizData.settings.passingScore;
+
+            // Check for email in URL parameter (for iframe usage)
+            const urlEmail = getEmailFromUrl();
+            if (urlEmail) {
+                userEmail = urlEmail;
+                // Skip start screen and begin quiz directly
+                document.getElementById('startScreen').classList.add('hidden');
+                initQuiz();
+                return;
+            }
+
+            // Check for saved progress
+            const continueSection = document.getElementById('continueSection');
+            if (hasStoredProgress()) {
+                const summary = getProgressSummary();
+                document.getElementById('savedEmail').textContent = summary.email;
+                document.getElementById('savedProgress').textContent =
+                    `${summary.answered} z ${summary.total} pytań`;
+                document.getElementById('userEmail').value = summary.email;
+                continueSection.classList.remove('hidden');
+            } else {
+                continueSection.classList.add('hidden');
+            }
+
+            // Add enter key listener for email input
+            document.getElementById('userEmail').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startQuiz();
+                }
+            });
+        }
+
+        // Validate email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Start quiz after email validation
+        function startQuiz() {
+            const emailInput = document.getElementById('userEmail');
+            const emailError = document.getElementById('emailError');
+            const email = emailInput.value.trim();
+
+            if (!isValidEmail(email)) {
+                emailInput.classList.add('error');
+                emailError.classList.add('show');
+                emailInput.focus();
+                return;
+            }
+
+            // Valid email - store and start quiz
+            userEmail = email;
+            emailInput.classList.remove('error');
+            emailError.classList.remove('show');
+
+            // Hide start screen, show quiz
+            document.getElementById('startScreen').classList.add('hidden');
+            initQuiz();
+        }
+
+        // Continue quiz from saved progress
+        function continueQuiz() {
+            const progress = loadProgress();
+            if (!progress) {
+                // No progress found, start fresh
+                startFresh();
+                return;
+            }
+
+            userEmail = progress.email;
+            continueFromSaved = true;
+
+            // Hide start screen, show quiz
+            document.getElementById('startScreen').classList.add('hidden');
+            initQuiz();
+
+            // Restore saved answers
+            userAnswers = progress.answers.slice();
+
+            // Ensure userAnswers array has correct length
+            while (userAnswers.length < quizData.questions.length) {
+                userAnswers.push(null);
+            }
+
+            // Go to last answered question or first unanswered
+            let targetIndex = 0;
+            for (let i = userAnswers.length - 1; i >= 0; i--) {
+                if (userAnswers[i] !== null) {
+                    targetIndex = Math.min(i + 1, quizData.questions.length - 1);
+                    break;
+                }
+            }
+
+            currentQuestionIndex = targetIndex;
+            showQuestion(currentQuestionIndex);
+            updateProgress();
+
+            continueFromSaved = false;
+        }
+
+        // Start fresh - clear saved progress
+        function startFresh() {
+            clearProgress();
+            document.getElementById('continueSection').classList.add('hidden');
+
+            // Focus on email input
+            document.getElementById('userEmail').focus();
+        }
+
+        // Initialize quiz
+        function initQuiz() {
+            document.getElementById('totalNum').textContent = quizData.questions.length;
+
+            // Shuffle questions if enabled
+            if (quizData.settings.shuffleQuestions) {
+                quizData.questions = shuffleArray(quizData.questions);
+            }
+
+            // Reset state
+            currentQuestionIndex = 0;
+            selectedAnswer = null;
+            userAnswers = new Array(quizData.questions.length).fill(null);
+            quizFinished = false;
+
+            // Show first question
+            showQuestion(0);
+            updateProgress();
+            updateNavigation();
+
+            // Show quiz screen
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('reviewScreen').classList.remove('active');
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function showQuestion(index) {
+            const question = quizData.questions[index];
+            selectedAnswer = userAnswers[index];
+
+            document.getElementById('currentNum').textContent = index + 1;
+            document.getElementById('questionNumber').textContent = `Pytanie ${index + 1}`;
+            document.getElementById('questionText').textContent = question.question;
+
+            // Show code if present
+            const codeBlock = document.getElementById('questionCode');
+            const codeContent = document.getElementById('codeContent');
+            if (question.code) {
+                codeContent.textContent = question.code;
+                codeBlock.style.display = 'block';
+                Prism.highlightElement(codeContent);
+            } else {
+                codeBlock.style.display = 'none';
+            }
+
+            // Render options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach(option => {
+                const isSelected = selectedAnswer === option.key;
+                const optionEl = document.createElement('div');
+                optionEl.className = `option-item${isSelected ? ' selected' : ''}`;
+                optionEl.dataset.key = option.key;
+                optionEl.innerHTML = `
+                    <div class="option-key">${option.key}</div>
+                    <div class="option-content">
+                        <div class="option-text">${option.text}</div>
+                        <div class="option-explanation">${option.explanation}</div>
+                    </div>
+                `;
+                optionEl.addEventListener('click', () => selectOption(option.key));
+                optionsContainer.appendChild(optionEl);
+            });
+
+            updateNavigation();
+        }
+
+        function selectOption(key) {
+            if (quizFinished) return;
+
+            selectedAnswer = key;
+            userAnswers[currentQuestionIndex] = key;
+
+            // Update UI
+            document.querySelectorAll('.option-item').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.key === key);
+            });
+
+            // Save progress to localStorage
+            saveProgress();
+
+            updateNavigation();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+
+            // Previous button
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+
+            // Next/Finish buttons
+            const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1;
+            nextBtn.classList.toggle('hidden', isLastQuestion);
+            finishBtn.classList.toggle('hidden', !isLastQuestion);
+
+            // Disable if no answer selected
+            nextBtn.disabled = !selectedAnswer;
+            finishBtn.disabled = !selectedAnswer;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        function finishQuiz() {
+            quizFinished = true;
+            // Clear saved progress - quiz is completed
+            clearProgress();
+            // Send results to webhook if configured
+            submitResults();
+            showResults();
+        }
+
+        function showResults() {
+            // Calculate scores
+            let correctCount = 0;
+            const topicScores = {};
+
+            quizData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+
+                if (isCorrect) correctCount++;
+
+                // Track by topic
+                if (!topicScores[q.topic]) {
+                    topicScores[q.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[q.topic].total++;
+                if (isCorrect) topicScores[q.topic].correct++;
+            });
+
+            const totalQuestions = quizData.questions.length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            // Update UI
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('active');
+
+            // Score
+            const scoreEl = document.getElementById('scoreValue');
+            scoreEl.textContent = percentage + '%';
+            scoreEl.className = 'results-score';
+            if (percentage >= 80) scoreEl.classList.add('score-high');
+            else if (percentage >= 50) scoreEl.classList.add('score-medium');
+            else scoreEl.classList.add('score-low');
+
+            // Counts
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = totalQuestions - correctCount;
+
+            // Pass/Fail status
+            const passStatus = document.getElementById('passStatus');
+            const passed = percentage >= quizData.settings.passingScore;
+            passStatus.innerHTML = passed ? '✓ Zaliczono!' : '✗ Nie zaliczono';
+            passStatus.className = `pass-status ${passed ? 'passed' : 'failed'}`;
+
+            // Topic scores
+            const topicContainer = document.getElementById('topicScoresContainer');
+            topicContainer.innerHTML = '';
+
+            Object.entries(topicScores).forEach(([topic, scores]) => {
+                const topicPercent = Math.round((scores.correct / scores.total) * 100);
+                const color = topicPercent >= 80 ? 'var(--color-success)' :
+                             topicPercent >= 50 ? 'var(--color-warning)' : 'var(--color-error)';
+
+                topicContainer.innerHTML += `
+                    <div class="topic-item">
+                        <span class="topic-name">${topic}</span>
+                        <div class="topic-score-container">
+                            <div class="topic-bar">
+                                <div class="topic-bar-fill" style="width: ${topicPercent}%; background: ${color};"></div>
+                            </div>
+                            <span class="topic-score-text">${scores.correct}/${scores.total} (${topicPercent}%)</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showReview() {
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('reviewScreen').classList.add('active');
+
+            const reviewContainer = document.getElementById('reviewContainer');
+            reviewContainer.innerHTML = '';
+
+            quizData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                const userOption = q.options.find(o => o.key === userAnswer);
+                const correctOption = q.options.find(o => o.key === q.correctAnswer);
+
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+
+                let answersHtml = `
+                    <div class="review-answer ${isCorrect ? 'user-correct' : 'user-incorrect'}">
+                        <span class="review-answer-icon">${isCorrect ? '&#10003;' : '&#10007;'}</span>
+                        <span>Twoja odpowiedź: <strong>${userAnswer}.</strong> ${userOption ? userOption.text : 'Brak odpowiedzi'}</span>
+                    </div>
+                `;
+
+                if (!isCorrect) {
+                    answersHtml += `
+                        <div class="review-answer correct-answer">
+                            <span class="review-answer-icon">&#10003;</span>
+                            <span>Poprawna odpowiedź: <strong>${q.correctAnswer}.</strong> ${correctOption.text}</span>
+                        </div>
+                    `;
+                }
+
+                reviewItem.innerHTML = `
+                    <div class="review-header">
+                        <div class="review-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '&#10003;' : '&#10007;'}</div>
+                        <div class="review-question">${index + 1}. ${q.question}</div>
+                    </div>
+                    <div class="review-answers">${answersHtml}</div>
+                    <div class="review-explanation">
+                        <div class="explanation-title">&#128161; Wyjaśnienie</div>
+                        <div class="explanation-text">${userOption ? userOption.explanation : correctOption.explanation}</div>
+                    </div>
+                `;
+                reviewContainer.appendChild(reviewItem);
+            });
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+        }
+
+        function restartQuiz() {
+            // Clear saved progress when restarting
+            clearProgress();
+            initQuiz();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initStartScreen);
+    </script>
+</body>
+</html>
